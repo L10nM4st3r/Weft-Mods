@@ -10,9 +10,8 @@ crate-type = ["cdylib"]
 # name = "examplemod"
 
 [dependencies]
-weft_sdk = { path = "../../crates/sdk" }
-base_api = { path = "../base/api" }
-base = { path = "../base" }
+weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
+base_api = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
 
 
 [workspace]

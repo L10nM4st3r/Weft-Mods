@@ -97,7 +97,7 @@ pub fn register(r: &mut Registry) {
     r.shapes_of("hollow_log", "#logs", "_hollow")
         .sound_group("base:block.wood")
         .model_file("hollow_log")
-        .model_texture("inside", "beauty_of_nature:block/{source}_inner")
+        //.model_texture("inside", "beauty_of_nature:block/{source}_inner")
         .axis()
         .signal_blocker()
         .shares_cell_with("#water")

@@ -33,12 +33,15 @@ impl ToolMaterial<'static> {
             .set(&WEAR_PER_HIT, if kind == "sword" { 1 } else { 2 })
             .tab(if kind == "sword" || kind == "knife" { &COMBAT } else { &TOOLS });
         if kind == "knife" {
-            b.tag(&format!("knives/{}", self.material_name));
+            b.sweeps()
+                .no_creative_break()
+                .tag(&format!("knives/{}", self.material_name));
+        } else if kind == "sword" {
+            b.sweeps()
+                .no_creative_break()
+                .tag(&format!("swords/{}", self.material_name));
         } else {
             b.tag(&format!("{kind}s/{}", self.material_name));
-        }
-        if kind == "sword" || kind == "knife" {
-            b.sweeps().no_creative_break();
         }
     }
 

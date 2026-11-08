@@ -3,12 +3,6 @@ name = "lions_mods"
 version = "0.1.1"
 edition = "2024"
 
-[lib]
-# Mandatory
-crate-type = ["cdylib"]
-# Only if the library must be named differently from the package:
-# name = "examplemod"
-
 [dependencies]
 weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
 base_api = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }

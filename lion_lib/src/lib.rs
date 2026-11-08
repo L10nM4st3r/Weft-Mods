@@ -66,7 +66,7 @@ impl ToolMaterial<'static> {
         self
     }
 
-    /// Allows this tool material to create a shovel item.
+    /// Allows this tool material to create all vanilla tools (does not include weapons).
     pub fn add_vanilla_tools(&self, hoe_damage: f32, hoe_speed: f32, axe_damage: f32, axe_speed: f32) -> ToolMaterial<'static> {
         let mut s = self.to_owned();
         s.shovel_enabled = true;
@@ -80,11 +80,20 @@ impl ToolMaterial<'static> {
         s
     }
 
-    /// Allows this tool material to create a shovel item.
+    /// Allows this tool material to create all vanilla tools and weapons.
     pub fn add_all_vanilla(&self, hoe_damage: f32, hoe_speed: f32, axe_damage: f32, axe_speed: f32) -> ToolMaterial<'static> {
         self.add_vanilla_tools(hoe_damage, hoe_speed, axe_damage, axe_speed);
         self.to_owned().sword_enabled = true;
         self.to_owned()
+    }
+
+    /// Allows this tool material to create all vanilla and modded tools and weapons.
+    pub fn add_all(&self, hoe_damage: f32, hoe_speed: f32, axe_damage: f32, axe_speed: f32) -> ToolMaterial<'static> {
+        let mut s = self.to_owned();
+        s.add_vanilla_tools(hoe_damage, hoe_speed, axe_damage, axe_speed);
+        s.sword_enabled = true;
+        s.knife_enabled = true;
+        s
     }
 
     /// Allows this tool material to create a sword item.
@@ -99,6 +108,7 @@ impl ToolMaterial<'static> {
         self
     }
 
+    /// Registers every enabled item into the item registry.
     pub fn register(self, r: &mut Registry) {
         if self.axe_enabled {
             self.create_tool(r, "axe", self.axe_damage, self.axe_speed);
@@ -121,6 +131,7 @@ impl ToolMaterial<'static> {
     }
 }
 
+/// Creates a tool material helper. Use this when adding new tool material sets.
 pub fn create_tool_material(material: &'static str, level: u32, damage: f32, mining_speed: f32, durability: u32) -> ToolMaterial<'static> {
     return ToolMaterial {
         material_name: material,

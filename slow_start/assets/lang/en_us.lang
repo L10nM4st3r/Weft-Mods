@@ -10,3 +10,6 @@ item.slow_start.animal_hide.tooltip = {on_key:!core:sneak}{lang:tooltip.more}{/o
 block.slow_start.drying_rack = Drying Rack
 menu.slow_start.drying_rack = Drying Rack
 recipe.slow_start.air_drying = Air Drying
+item.slow_start.flint_axe = Flint Axe
+item.slow_start.flint_pickaxe = Flint Pickaxe
+item.slow_start.flint_knife = Flint Knife

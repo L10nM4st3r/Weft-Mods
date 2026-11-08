@@ -14,6 +14,7 @@ pub fn register(r: &mut Registry) {
     r.shaped(&CRAFTING, "drying_rack", 1, &["ss", "##"], &[('#', "#logs"), ('s', "#stick")]);
     r.shaped(&CRAFTING, "base:cobblestone", 1, &["###", "# #", "###"], &[('#', "#stone_pebble")]);
     r.shapeless(&CRAFTING, "plant_string", 1, &["#plant_fibre", "#plant_fibre", "#plant_fibre"], 0);
+    r.shapeless(&CRAFTING, "base:flint", 1, &["base:gravel", "base:gravel", "base:gravel"], 5);
 
     r.shapeless(&AIR_DRYING, "jerky", 1, &["base:porkchop"], 1000);
     r.shapeless(&AIR_DRYING, "jerky", 1, &["base:chicken"], 1000);

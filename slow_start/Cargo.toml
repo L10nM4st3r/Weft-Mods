@@ -13,7 +13,7 @@ crate-type = ["cdylib"]
 weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
 base_api = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
 slow_start_api = { path = "./api" }
-lion_lib = { path = "./lion_lib" }
+lion_lib = { path = "../lion_lib" }
 
 
 [workspace]

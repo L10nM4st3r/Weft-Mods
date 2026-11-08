@@ -14,8 +14,6 @@ pub static BROWN_MUSHROOM: Block = Block::named("brown_mushroom");
 pub static BROWN_SHELF_MUSHROOM: Block = Block::named("brown_shelf_mushroom");
 
 static CACTUS: Block = Block::named("base:cactus");
-static FARMLAND: Block = Block::named("base:farmland");
-static HOES: Tag = Tag::named("tools/hoe");
 
 /// Small, like a flower or a mushroom.
 const SMALL: ([f32; 3], [f32; 3]) = ([5.0, 0.0, 5.0], [11.0, 10.0, 11.0]);
@@ -28,7 +26,7 @@ fn plant<'a>(r: &'a mut Registry, handle: &'static Block, soil: &str, (min, max)
         .sound_group("base:block.grass")
         .tag("plant")
         .plant()
-        .holds_liquid()
+        .shares_cell_with("#water")
         .hitbox(min, max)
         .needs_below(soil)
         .tab(&NATURAL)
@@ -45,7 +43,8 @@ pub fn register(r: &mut Registry) {
         .hardness(0.0)
         .not_solid()
         .replaceable()
-        .holds_liquid()
+        .shares_cell_with("#water")
+        .model_box([0.0, 1.0, 0.0], [16.0, 1.0, 16.0])
         .set(&FLAMMABLE, 15)
         .set(&FUEL, 100)
         .tag("branch")
@@ -56,14 +55,16 @@ pub fn register(r: &mut Registry) {
     r.block(&STONE_PEBBLE)
         .sound_group("base:block.stone")
         .texture("base:stone")
+        .item_texture("stone_pebble")
         .model_file("pebble")
         .hardness(0.1)
         .mined_by("pickaxe", tool_tier::HAND)
         .not_solid()
         .replaceable()
-        .holds_liquid()
+        .shares_cell_with("#water")
         .on_sides(Facings::only(&[Dir::Down]))
         .facing(Facings::HORIZONTAL, Toward::Face)
+        .tag("stone_pebble")
         .tag("pebble")
         .tab(&NATURAL);
 
@@ -83,7 +84,7 @@ pub fn register(r: &mut Registry) {
         .sound_group("base:block.wood")
         .hardness(0.2)
         .not_solid()
-        .holds_liquid()
+        .shares_cell_with("#water")
         .tag("shelf_mushroom")
         .facing(Facings::HORIZONTAL, Toward::Face)
         .model_box([3.0, 1.0, 11.0], [15.0, 3.0, 16.0])
@@ -96,33 +97,21 @@ pub fn register(r: &mut Registry) {
     r.shapes_of("hollow_log", "#logs", "_hollow")
         .sound_group("base:block.wood")
         .model_file("hollow_log")
+        .model_texture("inside", "beauty_of_nature:block/{source}_inner")
         .axis()
-        .holds_liquid()
         .signal_blocker()
+        .shares_cell_with("#water")
+        .liquid_walls(&[Dir::North, Dir::South, Dir::East, Dir::West])
         .outline([0.0; 3], [16.0; 3])
         .tag("hollow_log")
         .tab(&NATURAL);
 
     // Cactus grows a flower once it is three tall.
     r.edit(&CACTUS)
-        .holds_liquid()
+        .shares_cell_with("#water")
         .on_grow(|e| grow_column(e, &CACTUS, 3, &CACTUS_FLOWER));
 
-    // A hoe turns grass and dirt, any mod's tagged so, into farmland.
-    r.tag("tillable", &["base:grass", "base:dirt"]);
-    r.edit_pattern::<kind::Block>("#tillable").on_use(till);
-
     r.tag("desert_plant_soil", &["#plant_soil", "#cactus_soil"]);
-}
-
-fn till(u: &mut Use) -> bool {
-    let (w, pos, player) = (u.world(), u.pos(), u.player());
-    let held = w.inventory(player).get(w.selected_slot(player));
-    if !HOES.on_item(held.item) || w.block([pos.x, pos.y + 1, pos.z]) != 0 {
-        return false;
-    }
-    w.set_block(pos, FARMLAND.id());
-    true
 }
 
 /// One more of `me` on top, `flower` instead once the column is `max` tall.

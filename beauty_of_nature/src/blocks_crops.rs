@@ -16,6 +16,7 @@ pub fn register(r: &mut Registry) {
             .needs_below("#plant_soil")
             .set(&FLAMMABLE, 15)
             .tag("plant")
+            .shares_cell_with("#water")
             .tag("wild_crop")
             .tab(&NATURAL);
         r.loot(wild).pool(Pool::new().entry(Entry::item(name).count(1, 3)));
@@ -25,6 +26,7 @@ pub fn register(r: &mut Registry) {
             .prop("age", 0..=6)
             .states(move |p, s| s.texture(&format!("{name}_stage_{}", p.get("age"))))
             .plant()
+            .shares_cell_with("#water")
             .needs_below("#crop_soil")
             .grows(205.0, 9)
             .set(&FLAMMABLE, 15)
@@ -34,7 +36,7 @@ pub fn register(r: &mut Registry) {
             .pool(Pool::new().entry(Entry::item(name)))
             .pool(
                 Pool::new()
-                    .when(Cond::BlockState("age=6"))
+                    .when(Cond::state("age=6"))
                     .entry(Entry::item(name).count(1, 3)),
             );
 

@@ -1,0 +1,12 @@
+mod.slow_start.name = Slow Start
+mod.slow_start.description = Makes the early-game (pre-crafting table) much longer in a hopefully non-tedious way.
+mod.slow_start.authors = L10nM4st3r
+
+item.slow_start.jerky = Dried Jerky
+item.slow_start.plant_fibre = Plant Fibre
+item.slow_start.plant_string = Plant String
+item.slow_start.animal_hide = Animal Hide
+item.slow_start.animal_hide.tooltip = {on_key:!core:sneak}{lang:tooltip.more}{/on_key}{on_key:core:sneak}Dry in a drying rack to create leather.{/on_key}
+block.slow_start.drying_rack = Drying Rack
+menu.slow_start.drying_rack = Drying Rack
+recipe.slow_start.air_drying = Air Drying

@@ -1,0 +1,23 @@
+[package]
+name = "slow_start"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+# Mandatory
+crate-type = ["cdylib"]
+# Only if the library must be named differently from the package:
+# name = "examplemod"
+
+[dependencies]
+weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
+base_api = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
+slow_start_api = { path = "./api" }
+
+
+[workspace]
+
+[profile.release]
+# How much debug information to keep. "line-tables-only" is enough for crash reports and
+# panics to name the line. false = none, true = everything (big).
+debug = "line-tables-only"

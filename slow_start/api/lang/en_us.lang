@@ -1,0 +1,29 @@
+mod.slow_start.name = Slow Start
+mod.slow_start.description = Makes the early-game (pre-crafting table) much longer in a hopefully non-tedious way.
+mod.slow_start.authors = L10nM4st3r
+
+item.slow_start.jerky = Dried Jerky
+item.slow_start.plant_fibre = Plant Fibre
+item.slow_start.plant_string = Plant String
+item.slow_start.animal_hide = Animal Hide
+item.slow_start.animal_hide.tooltip = {on_key:!core:sneak}{lang:tooltip.more}{/on_key}{on_key:core:sneak}Dry in a drying rack to create leather.{/on_key}
+block.slow_start.campfire_complete = Campfire
+menu.slow_start.campfire = Campfire
+recipe.slow_start.campfire_recipe = Campfire Cooking
+block.slow_start.drying_rack = Drying Rack
+menu.slow_start.drying_rack = Drying Rack
+recipe.slow_start.air_drying = Air Drying
+block.base.furnace = Cobblestone Furnace
+menu.base.furnace = Cobblestone Furnace
+block.slow_start.brick_stove = Primitive Brick Furnace
+menu.slow_start.brick_stove = Primitive Brick Furnace
+recipe.slow_start.brick_stove_recipe = Smelting - Brick Furnace
+item.slow_start.flint_axe = Flint Axe
+item.slow_start.flint_pickaxe = Flint Pickaxe
+item.slow_start.flint_knife = Flint Knife
+
+block.slow_start.raw_clay_single_brick = Raw Clay Brick
+block.slow_start.raw_clay_single_brick.tooltip = {on_key:!core:sneak}{lang:tooltip.more}{/on_key}{on_key:core:sneak}Takes about 2 minutes to dry when placed. Protect from the rain.{/on_key}
+block.slow_start.single_brick = Brick
+block.slow_start.campfire_base = Campfire Base
+block.slow_start.campfire_base.tooltip = {on_key:!core:sneak}{lang:tooltip.more}{/on_key}{on_key:core:sneak}Place one of these on top of another to create a campfire.{/on_key}

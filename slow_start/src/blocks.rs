@@ -1,151 +1,141 @@
-use base_api::tabs::FUNCTIONAL;
-pub use slow_start_api::{AIR_DRYING, AIR_DRYING_EVENT, AIR_DRYING_STATE, AIR_DRYING_TIME, AirDried, AirDrying};
+use base_api::tabs::{FUNCTIONAL, INGREDIENTS};
+use base_api::{FLAMMABLE, FUEL};
 use weft_sdk::*;
 
-pub static DRYING_RACK: Block = Block::named("drying_rack");
-pub static DRYING_RACK_MENU: Menu = Menu::named("drying_rack");
+pub static PLANT_FIBRE: Item = Item::named("plant_fibre");
+pub static KNIVES: Tag = Tag::named("tools/knife");
+pub static PLACABLE_BRICK_CONVERTABLE: Tag = Tag::named("placable_brick_convertable");
+pub static TALL_GRASS: Block = Block::named("base:tall_grass");
+
+pub static CAMPFIRE_BASE: Block = Block::named("campfire_base");
+pub static CAMPFIRE: Block = Block::named("campfire_complete");
+pub static RAW_CLAY_SINGLE_BRICK: Block = Block::named("raw_clay_single_brick");
+pub static SINGLE_BRICK: Block = Block::named("single_brick");
+
+//pub static IRON_ORE: Block = Block::named("base:iron_ore");
 
 pub fn register(r: &mut Registry) {
-    r.entity_component(
-        &AIR_DRYING_STATE,
-        AirDrying { progress: 0, progress_max: 0, dry: 0, dry_max: 0, drying_item: 0, was_filled: false },
-        component_flags::SAVE | component_flags::SYNC_MENU,
-    );
-    r.system(&AIR_DRYING_STATE, tick_furnaces);
+    r.edit(&TALL_GRASS)
+        .on_break(|w: &World, b: &BlockChange| break_grass(w, b));
 
-    // Drying Rack
-    r.block(&DRYING_RACK)
-        // Front towards the player; unlit and lit.
+    r.block(&CAMPFIRE_BASE)
+        .model_file("campfire_base")
         .sound_group("base:block.wood")
-        .texture("base:log_oak")
-        .facing(Facings::HORIZONTAL, Toward::Player)
-        .model_file("drying_rack")
         .hardness(2.0)
+        .mined_by("axe", tool_tier::HAND)
+        .set(&FLAMMABLE, 5)
+        .set(&FUEL, 300)
+        .facing(Facings::HORIZONTAL, Toward::Player)
         .shares_cell_with("#water")
-        .mined_by("axe", 0)
-        .prop("filled", ["false", "true"])
-        .states(|p, s| if p.is("filled", "true") { s.model_file("drying_rack_filled") } else { s })
-        .tab(&FUNCTIONAL)
-        .entity(|e| e.attach(&AIR_DRYING_STATE).inventory(2))
-        .opens(&DRYING_RACK_MENU);
+        .texture("base:log_oak")
+        .on_use(upgrade_campfire_base)
+        .outline([0.0, 0.0, 0.0], [16.0, 3.0, 16.0])
+        .hitbox([0.0, 0.0, 0.0], [16.0, 3.0, 16.0])
+        .tab(&FUNCTIONAL);
 
-    r.menu(&DRYING_RACK_MENU)
-        .group("input", Slots::single().holder())
-        .group("output", Slots::single().output().holder())
-        .recipes(&AIR_DRYING)
-        .player_inventory()
-        .screen(|ui| {
-            ui.panel("panel", S::column().pad(7.0).gap(4.0).stretch(), |ui| {
-                ui.title();
-                ui.row(S::row().gap(8.0), |ui| {
-                    ui.spacer();
-                    ui.column(S::column().gap(2.0), |ui| {
-                        ui.group("input");
-                    });
-                    ui.recipe_arrow_bind(|c| {
-                        c.menu_component(&AIR_DRYING_STATE)
-                            .map_or(0.0, |s| ratio(s.dry, s.dry_max))
-                    });
-                    ui.group("output");
-                    ui.spacer();
-                });
-                ui.player_inventory(true);
-            });
+    do_brick_behaviour(
+        r.block(&RAW_CLAY_SINGLE_BRICK)
+            .tag("placable_brick_convertable")
+            .shares_cell_with("#water")
+            .texture("base:clay")
+            .grows(120.0, 0)
+            .item_texture("raw_clay_brick")
+            .on_grow(on_brick_grown)
+            //.sound_group("base:block.clay")
+            .hardness(0.01),
+    );
+
+    do_brick_behaviour(
+        r.block(&SINGLE_BRICK)
+            .shares_cell_with("#water")
+            .texture("single_brick")
+            .sound_group("base:block.stone")
+            .item_texture("brick")
+            .hardness(0.01),
+    );
+
+    // r.edit_pattern::<kind::Block>("#ores/iron")
+    //     .replaceable()
+    //     .mined_by("pickaxe", tool_tier::WOOD);
+}
+
+fn upgrade_campfire_base(u: &mut Use) -> bool {
+    let (w, pos, player) = (u.world(), u.pos(), u.player());
+    let slot = w.selected_slot(player);
+    let held = w.inventory(player).get(slot);
+
+    let places = item_info(held.item).and_then(|i| i.block);
+    if Some(block_of(w.block(pos))) == places {
+        w.set_block(pos, CAMPFIRE.id());
+        w.inventory(player).set(slot, consume_one(held));
+        return true;
+    }
+    false
+}
+
+fn do_brick_behaviour(block: BlockBuilder) {
+    block
+        .tab(&INGREDIENTS)
+        .prop("x", 1..=8)
+        .prop("y", 1..=8)
+        .prop("z", 1..=8)
+        .states(|p: &Props, s| {
+            let x = p.get("x").parse::<f32>().unwrap() * 2.0;
+            let y = p.get("y").parse::<f32>().unwrap() * 2.0;
+            let z = p.get("z").parse::<f32>().unwrap() * 2.0;
+            s.model_box([x - 2.0, y - 2.0, z - 2.0], [x + 2.0, y + 2.0, z + 4.0])
+        })
+        .placement(|p, props| {
+            let hit = p.hit();
+            props.set("x", &(hit.x * 8.0).floor().to_string());
+            props.set("y", &((hit.y * 8.0) + 1.0).floor().to_string());
+            props.set("z", &(hit.z * 8.0).floor().to_string());
         });
 }
 
-/// `ticks` of one drying rack at once (its area was unloaded, the time jumped)
-fn catch_up(w: &World, id: u64, s: &mut AirDrying, ticks: u32) {
-    let inv = w.inventory(id);
-    let (input_slot, output_slot) = (inv.group("input"), inv.group("output"));
-    let (input, output) = (input_slot.get(0), output_slot.get(0));
-    let mut idle = ticks as u64;
-    if let Some((out, time)) = (!input.is_empty())
-        .then(|| recipe_process(&AIR_DRYING, input.item))
-        .flatten()
-    {
-        let q = abi::Query { entity: id, item: input.item, ..query() };
-        s.dry_max = w
-            .chain_compute(&AIR_DRYING_TIME, time as f64, &q)
-            .round()
-            .max(1.0) as u32;
-        let items = (input.count).min(output.room_for(out)) as u64;
-        let work = (items * s.dry_max as u64).saturating_sub(s.dry as u64);
-        let worked = idle.min(work);
-        let filled = if worked > s.progress as u64 { worked - s.progress as u64 } else { 0 };
-        s.progress = (s.progress as u64 + filled - worked) as u32;
-        let total = s.dry as u64 + worked;
-        let done = (total / s.dry_max as u64) as u32;
-        s.dry = (total % s.dry_max as u64) as u32;
-        if done > 0 {
-            input_slot.set(0, input.shrink(done));
-            output_slot.set(0, output.merged(out, done));
-            for _ in 0..done {
-                w.emit(&AIR_DRYING_EVENT, AirDried { drying_rack: id, input: input.item, output: out });
+fn on_brick_grown(b: &mut BlockEvent) {
+    let (w, pos, state) = (b.world(), b.pos(), b.state());
+    let parts = w.parts(pos);
+
+    if w.weather() != weathers::CLEAR.id() && w.sky_light(pos) == 15 {
+        w.spawn_particles(&Particle::named("core:poof"), Vec3::new(pos.x as f64 + 0.5, pos.y as f64 + 0.5, pos.z as f64 + 0.5))
+            .count(5)
+            .outward()
+            .velocity([0.0 as f32, 0. - 3.0 as f32, 0.0 as f32])
+            .spread(0.1)
+            .speed(2.0)
+            .color(8029081);
+        parts.iter().for_each(|&s| {
+            if PLACABLE_BRICK_CONVERTABLE.on_block(s) && s == state {
+                w.part_replace(pos, s, 0);
             }
-        }
-        idle -= worked;
+        });
+        return;
     }
-    s.progress = (s.progress as u64).saturating_sub(idle) as u32;
-    s.dry = (s.dry as u64).saturating_sub(idle * 2) as u32;
+
+    let part_offset = state - RAW_CLAY_SINGLE_BRICK.id();
+
+    parts.iter().for_each(|&s| {
+        if PLACABLE_BRICK_CONVERTABLE.on_block(s) && s == state {
+            w.part_replace(pos, s, Block::named("single_brick").id() + part_offset);
+        }
+    });
 }
 
-/// Every furnace of a region at once, through its state (a system: no host call to reach it).
-fn tick_furnaces(b: &mut SystemBatch<AirDrying>) {
-    let w = b.world();
-    for (id, s, ticks) in b.iter_mut() {
-        let Some(st) = w.entity(id) else { continue };
-        if ticks > 1 {
-            catch_up(&w, id, s, ticks);
-            continue;
-        }
-        let pos = st.block_pos();
-        let inv = w.inventory(id);
-        let (input_slot, output_slot) = (inv.group("input"), inv.group("output"));
-        let (input, output) = (input_slot.get(0), output_slot.get(0));
+fn break_grass(w: &World, b: &BlockChange) {
+    let (pos, player) = (b.pos, b.player);
+    let (inv, held_slot) = (w.inventory(player), w.selected_slot(player));
+    let held = inv.get(held_slot);
 
-        if s.progress > 0 {
-            s.progress -= 1;
-        }
-        // Another item in the input starts over, before this tick counts for it.
-        if input.item != s.drying_item {
-            s.drying_item = input.item;
-            s.dry = 0;
-        }
-        let recipe = (!input.is_empty())
-            .then(|| recipe_process(&AIR_DRYING, input.item))
-            .flatten();
-        let fits = recipe.is_some_and(|(out, _)| output.room_for(out) > 0);
-        if s.progress == 0 && fits {
-            s.progress = ticks;
-            s.progress_max = ticks;
-        }
-        if s.progress > 0 && fits {
-            let (out, time) = recipe.unwrap();
-            let q = abi::Query { entity: id, item: input.item, ..query() };
-            s.dry_max = w
-                .chain_compute(&AIR_DRYING_TIME, time as f64, &q)
-                .round()
-                .max(1.0) as u32;
-            s.dry += 1;
-            if s.dry >= s.dry_max {
-                s.dry = 0;
-                input_slot.set(0, input.shrink(1));
-                output_slot.set(0, output.merged(out, 1));
-                w.emit(&AIR_DRYING_EVENT, AirDried { drying_rack: id, input: input.item, output: out });
-            }
-        } else if s.progress > 0 {
-            // Modern's: burning with nothing it can do starts over; out of fuel it cools down.
-            s.dry = 0;
-        } else {
-            s.dry = s.dry.saturating_sub(2);
-        }
+    if KNIVES.on_item(held.item) {
+        let left = DURABILITY
+            .on_stack(&held)
+            .unwrap_or(0)
+            .saturating_sub(held.wear());
+        let extra = left.min(1); // Lose 1 durability
+        let next = held.add_wear(extra);
+        inv.set(held_slot, next);
 
-        let (input, output) = (input_slot.get(0), output_slot.get(0));
-        let filled = input.item != 0 || output.item != 0;
-        if filled != s.was_filled && DRYING_RACK.is(w.block(pos)) {
-            s.was_filled = filled;
-            w.prop_set(pos, "filled", if filled { "true" } else { "false" });
-        }
+        w.spawn_item(Vec3::new(pos.x as f64, pos.y as f64, pos.z as f64), ItemStack { item: PLANT_FIBRE.id(), count: 1, data: 0 });
     }
 }

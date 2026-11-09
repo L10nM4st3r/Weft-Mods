@@ -1,6 +1,6 @@
 use base_api::tabs::{FOOD, INGREDIENTS};
 use base_api::{FOOD as FOOD_VALUE, Food};
-use lion_lib::*;
+use slow_start_api::FIRE_STARTER;
 use weft_sdk::*;
 
 pub static ANIMAL_HIDE: Item = Item::named("animal_hide");
@@ -8,12 +8,20 @@ pub static PLANT_FIBRE: Item = Item::named("plant_fibre");
 pub static PLANT_STRING: Item = Item::named("plant_string");
 pub static JERKY: Item = Item::named("jerky");
 
-//const MATERIALS: [ToolMaterial; 1] = [ToolMaterial { name: "flint", level: tool_tier::WOOD, speed: 1.5, durability: 32, damage: 0.0 }];
+pub static FLINT: Item = Item::named("base:flint");
+pub static COAL: Item = Item::named("base:coal");
 
 pub fn register(r: &mut Registry) {
     r.item(&ANIMAL_HIDE).tag("animal_hide").tab(&INGREDIENTS);
     r.item(&PLANT_FIBRE).tag("plant_fibre").tab(&INGREDIENTS);
     r.item(&PLANT_STRING).tag("plant_string").tab(&INGREDIENTS);
+
+    r.edit(&FLINT).set(&FIRE_STARTER, 6000).tag("campfire_fuel"); // 5 minutes
+    r.edit(&COAL).tag("campfire_fuel");
+    r.edit_pattern::<kind::Item>("#stick").tag("campfire_fuel");
+    r.edit_pattern::<kind::Block>("#stick").tag("campfire_fuel");
+    r.edit_pattern::<kind::Block>("#logs").tag("campfire_fuel");
+
     r.item(&JERKY)
         .tag("dried_meat")
         .tab(&FOOD)
@@ -21,8 +29,8 @@ pub fn register(r: &mut Registry) {
         .use_ticks(32)
         .on_use(base_api::eat);
 
-    create_tool_material(&"flint", tool_tier::WOOD, 0.0, 1.1, 32)
-        .add_axe(2.0, 0.8)
+    lion_lib::create_tool_material(&"flint", tool_tier::WOOD, 0.0, 1.1, 32)
+        .add_axe(2.5, 0.8)
         .add_pickaxe()
         .add_knife()
         .register(r);

@@ -30,8 +30,9 @@ impl ToolMaterial<'static> {
             .attack_damage(damage)
             .attack_speed(speed)
             // Weapons wear by one per hit, tools (made for blocks) by two.
-            .set(&WEAR_PER_HIT, if kind == "sword" { 1 } else { 2 })
+            .set(&WEAR_PER_HIT, if kind == "sword" || kind == "knife" { 1 } else { 2 })
             .tab(if kind == "sword" || kind == "knife" { &COMBAT } else { &TOOLS });
+
         if kind == "knife" {
             b.sweeps()
                 .no_creative_break()

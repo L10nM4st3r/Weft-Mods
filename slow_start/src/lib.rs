@@ -1,5 +1,8 @@
 mod blocks;
+mod brick_stove;
+mod campfire;
 mod crafting;
+mod drying_rack;
 mod items;
 
 use weft_sdk::*;
@@ -10,7 +13,10 @@ static COW: EntityKind = EntityKind::named("base:cow");
 fn init(r: &mut Registry) {
     blocks::register(r);
     crafting::register(r);
+    drying_rack::register(r);
+    campfire::register(r);
     items::register(r);
+    brick_stove::register(r);
 
     r.edit(&COW.loot())
         .clear()

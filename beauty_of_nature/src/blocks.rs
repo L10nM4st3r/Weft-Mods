@@ -4,6 +4,7 @@ use weft_sdk::*;
 
 pub static BRANCH: Block = Block::named("branch");
 pub static STONE_PEBBLE: Block = Block::named("stone_pebble");
+pub static IRON_PEBBLE: Block = Block::named("iron_pebble");
 
 pub static BLUE_ORCHID: Block = Block::named("blue_orchid");
 pub static CACTUS_FLOWER: Block = Block::named("cactus_flower");
@@ -44,7 +45,7 @@ pub fn register(r: &mut Registry) {
         .not_solid()
         .replaceable()
         .shares_cell_with("#water")
-        .model_box([0.0, 1.0, 0.0], [16.0, 1.0, 16.0])
+        .model_file("flat_block")
         .set(&FLAMMABLE, 15)
         .set(&FUEL, 100)
         .tag("branch")
@@ -65,6 +66,22 @@ pub fn register(r: &mut Registry) {
         .on_sides(Facings::only(&[Dir::Down]))
         .facing(Facings::HORIZONTAL, Toward::Face)
         .tag("stone_pebble")
+        .tag("pebble")
+        .tab(&NATURAL);
+
+    r.block(&IRON_PEBBLE)
+        .sound_group("base:block.stone")
+        .texture("iron_pebble")
+        .item_texture("iron_pebble")
+        .model_file("pebble")
+        .hardness(0.1)
+        .mined_by("pickaxe", tool_tier::HAND)
+        .not_solid()
+        .replaceable()
+        .shares_cell_with("#water")
+        .on_sides(Facings::only(&[Dir::Down]))
+        .facing(Facings::HORIZONTAL, Toward::Face)
+        .tag("iron_pebble")
         .tag("pebble")
         .tab(&NATURAL);
 
@@ -97,12 +114,14 @@ pub fn register(r: &mut Registry) {
     r.shapes_of("hollow_log", "#logs", "_hollow")
         .sound_group("base:block.wood")
         .model_file("hollow_log")
+        .model_texture("inside", "base_oak_log_inner")
         //.model_texture("inside", "beauty_of_nature:block/{source}_inner")
         .axis()
         .signal_blocker()
         .shares_cell_with("#water")
         .liquid_walls(&[Dir::North, Dir::South, Dir::East, Dir::West])
         .outline([0.0; 3], [16.0; 3])
+        .outline([2.0, 0.0, 2.0], [14.0, 16.0, 14.0])
         .tag("hollow_log")
         .tab(&NATURAL);
 

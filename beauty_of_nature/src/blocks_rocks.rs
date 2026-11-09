@@ -78,20 +78,23 @@ pub fn register(r: &mut Registry) {
 
 
     add_rock(r, &UPPER_MANTLE_ROCK, 32.5)
+        .immovable()
         .tag("mantle_stone");
 
 
     add_rock(r, &LOWER_MANTLE_ROCK, 65.0)
+        .immovable()
         .tag("mantle_stone");
 
 
     add_rock(r, &CORE_ALLOY, 500.0)
+        .immovable()
         .texture("solid_core")
         .tag("core_alloy");
 
         
     r.liquid(&UPPER_CORE_LIQUID)
-        .block(|b| b.light(15).drag(0.8).tag("core_liquid").texture("upper_core_liquid"))
+        .block(|b| b.light(15).drag(0.8).immovable().tag("core_liquid").texture("upper_core_liquid"))
         .flow_delay(120)
         .drop_off(2)
         .slope_find(2)

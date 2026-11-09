@@ -3,6 +3,7 @@ shape.hollow_log = Hollow {0}
 block.beauty_of_nature.blue_orchid = Blue Orchid
 block.beauty_of_nature.branch = Branch
 block.beauty_of_nature.stone_pebble = Stone Pebble
+block.beauty_of_nature.iron_pebble = Iron Pebble
 block.beauty_of_nature.cactus_flower = Cactus Flower
 block.beauty_of_nature.dense_rock = Dense Rock
 block.beauty_of_nature.cobbled_dense_rock = Cobbled Dense Rock

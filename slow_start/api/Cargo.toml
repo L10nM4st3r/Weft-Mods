@@ -1,0 +1,8 @@
+[package]
+name = "slow_start_api"
+version = "0.1.0"
+edition = "2024"
+
+# Types and handles of the base game other mods compile against; no code of the game itself.
+[dependencies]
+weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }

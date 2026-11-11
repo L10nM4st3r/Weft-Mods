@@ -48,3 +48,18 @@ jobs:
         with:
           submodules: true
       - uses: Zorro909/weft-mod-action/release@v2
+
+
+  # Each full release (X.Y.Z, not a release candidate), to the Weft mod index.
+  index-pr:
+    needs: release
+    if: needs.release.outputs.releases != '' && vars.WEFT_INDEX_PR == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Zorro909/weft-mod-action/index-pr@v2
+        with:
+          token: ${{ secrets.WEFT_INDEX_TOKEN }}
+          tags: ${{ needs.release.outputs.releases }}
+          # mods: |          # the same folders as above
+          #   cogwork
+          #   structures

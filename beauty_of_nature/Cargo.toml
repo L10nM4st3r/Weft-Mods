@@ -10,8 +10,8 @@ crate-type = ["cdylib"]
 # name = "examplemod"
 
 [dependencies]
-weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
-base_api = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
+weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master", tag=v26.11.4 }
+base_api = { git = "https://github.com/Weft-Rust/Weft", branch = "master", tag=v26.11.4 }
 tetanus_api = { path = "../tetanus/api" }
 
 

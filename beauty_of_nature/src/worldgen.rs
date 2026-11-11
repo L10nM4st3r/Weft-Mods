@@ -27,6 +27,7 @@ static STONE: Tag = Tag::named("stone_ore_replaceables");
 static BRANCHES_SCATTER: Feature = Feature::named("branches");
 static PEBBLES_SCATTER: Feature = Feature::named("pebbles");
 static WILD_CROPS_SCATTER: Feature = Feature::named("wild_crops");
+static ROCK_LAYER_FEATURE: Feature = Feature::named("rock_layers");
 
 static GRAVEL: Block = Block::named("base:gravel");
 //static BIRCH_LOG: Block = Block::named("base:birch_log");
@@ -128,7 +129,9 @@ pub fn register(r: &mut Registry) {
         );
     }
 
-    r.decoration(rock_layers).dimension(&OVERWORLD);
+    r.feature(&ROCK_LAYER_FEATURE)
+        .generate(rock_layers)
+        .dimension(&OVERWORLD);
 
     // Base's ores, deeper and with a block of their own where a vein goes through dense rock.
     for ((ore, ..), (min_y, max_y, veins, size, exposed)) in ORES.iter().zip([
@@ -142,12 +145,22 @@ pub fn register(r: &mut Registry) {
         let super_dense = Block::generated(format!("super_dense_rock_{ore}_ore"));
         let ultra_dense = Block::generated(format!("ultra_dense_rock_{ore}_ore"));
 
+        // r.ore(dense)
+        //     .y(i32::MIN, max_y)
+        //     .per_cube(veins)
+        //     .vein_size(size).after(&ROCK_LAYER_FEATURE)
+        //     .replaces("#dense_rock_ore_replaceables")
+        //     .replaces_with("#super_dense_rock_ore_replaceables", super_dense)
+        //     .replaces_with("#ultra_dense_rock_ore_replaceables", ultra_dense)
+        //     .exposed(exposed);
+
         r.edit(Block::generated(format!("base:{ore}_ore")).ore())
             .y(min_y, max_y)
             .per_cube(veins)
             .vein_size(size)
+            .after(&ROCK_LAYER_FEATURE)
             .exposed(exposed)
-            .replaces("base:stone")
+            .replaces("#stone_ore_replaceables")
             .replaces_with("#dense_rock_ore_replaceables", dense)
             .replaces_with("#super_dense_rock_ore_replaceables", super_dense)
             .replaces_with("#ultra_dense_rock_ore_replaceables", ultra_dense);

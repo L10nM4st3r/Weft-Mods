@@ -39,15 +39,18 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    outputs:
+      releases: ${{ steps.release.outputs.releases }}
     permissions:
-      contents: write     # the releases
-      id-token: write     # the provenance attestations
+      contents: write
+      id-token: write
       attestations: write
     steps:
       - uses: actions/checkout@v7
         with:
           submodules: true
-      - uses: Zorro909/weft-mod-action/release@v2
+      - id: release
+        uses: Zorro909/weft-mod-action/release@v2
 
 
   # Each full release (X.Y.Z, not a release candidate), to the Weft mod index.

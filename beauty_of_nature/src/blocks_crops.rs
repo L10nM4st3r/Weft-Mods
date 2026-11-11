@@ -1,13 +1,16 @@
 use base_api::tabs::{FOOD, NATURAL};
 use base_api::{FLAMMABLE, FOOD as FOOD_VALUE, Food};
 use weft_sdk::*;
+use tetanus_api::{DRINK, Drink, drink_item};
 
 /// Each crop: a wild plant found in the world, the crop it is planted as on farmland, and the
 /// food both give.
-const CROPS: [&str; 3] = ["carrot", "potato", "onion"];
+const CROPS: [(&str, u32); 3] = [("carrot", 1), ("potato", 2), ("onion", 2)];
 
 pub fn register(r: &mut Registry) {
-    for name in CROPS {
+    let tetanus = r.has_mod("tetanus");
+
+    for (name, thirst) in CROPS {
         let (wild, crop) = (Block::generated(format!("wild_{name}")), Block::generated(format!("{name}_crop")));
         r.block(wild)
             .sound_group("base:block.grass")
@@ -40,12 +43,21 @@ pub fn register(r: &mut Registry) {
                     .entry(Entry::item(name).count(1, 3)),
             );
 
-        r.item(Item::generated(name.into()))
-            .set(&FOOD_VALUE, Food { hunger: 3, saturation: 2.0 })
+        let item = r.item(Item::generated(name.into()))
             .use_ticks(32)
-            .on_use(base_api::eat)
+            .set(&FOOD_VALUE, Food { hunger: 3, saturation: 2.0 })
+            //.tag("can_always_eat")
             .places(crop)
             .tag(&format!("crops/{name}"))
+            .set(&DRINK, Drink { thirst, wet_throat: thirst as f32 * 0.75 })
             .tab(&FOOD);
+
+
+        if tetanus {
+            item.on_use(drink_item);
+        }
+        else {
+            item.on_use(base_api::eat);
+        }
     }
 }

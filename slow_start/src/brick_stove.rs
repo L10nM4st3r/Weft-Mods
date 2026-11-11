@@ -25,9 +25,13 @@ pub fn register(r: &mut Registry) {
         .hardness(3.5)
         .mined_by("pickaxe", 0)
         .prop("lit", ["false", "true"])
-        .states(|p, s| {
+        .states(|p, s: State| {
             let lit = p.is("lit", "true");
-            let s = s.front_faces("brick_stove_side", "brick_stove_top", if lit { "brick_stove_front_lit" } else { "brick_stove_front" });
+
+            let s = s
+                .front(if lit { "brick_stove_front_lit" } else { "brick_stove_front" })
+                .sides("brick_stove_side")
+                .ends("brick_stove_top");
             if lit { s.light_rgb(13, 11, 8) } else { s }
         })
         .tab(&FUNCTIONAL)
@@ -36,7 +40,7 @@ pub fn register(r: &mut Registry) {
 
     r.menu(&BRICK_STOVE_MENU)
         .group("input", Slots::single().holder())
-        .group("fuel", Slots::single().accepts("campfire_fuel").holder())
+        .group("fuel", Slots::single().accepts("#fuel #campfire_starter").holder())
         .group("output", Slots::single().output().holder())
         .recipes(&BRICK_STOVE_RECIPE)
         .player_inventory()

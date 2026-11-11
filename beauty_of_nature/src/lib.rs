@@ -6,7 +6,8 @@ mod worldgen;
 
 use weft_sdk::*;
 
-declare_mod!(deps: ["base"], init: init);
+// Allow beauty of nature to overwrite tough as rust's underground temperatures.
+declare_mod!(deps: ["base"], after: ["tetanus"], before: [], init: init);
 
 fn init(r: &mut Registry) {
     blocks::register(r);

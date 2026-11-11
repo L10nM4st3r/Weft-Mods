@@ -1,7 +1,7 @@
 use base_api::FUEL;
 use base_api::tabs::FUNCTIONAL;
 pub use slow_start_api::{CAMPFIRE_COOKED, CAMPFIRE_RECIPE, CAMPFIRE_STATE, CAMPFIRE_TIME, CampfireCooked, CampfireCooking, FIRE_STARTER};
-use weft_sdk::*;
+use weft_sdk::{damage_causes::FIRE, *};
 
 pub static CAMPFIRE: Block = Block::named("campfire_complete");
 pub static CAMPFIRE_MENU: Menu = Menu::named("campfire");
@@ -26,7 +26,7 @@ pub fn register(r: &mut Registry) {
         .hitbox([0.0, 0.0, 0.0], [16.0, 6.0, 16.0])
         .hardness(2.0)
         .shares_cell_with("#water")
-        .mined_by("axe", 0)
+        .mined_by("axe", tool_tier::HAND)
         .prop("lit", ["false", "true"])
         .prop("show_ash", ["false", "true"])
         .drops("campfire_base", 2)
@@ -40,7 +40,7 @@ pub fn register(r: &mut Registry) {
 
     r.menu(&CAMPFIRE_MENU)
         .group("input", Slots::single().holder())
-        .group("fuel", Slots::single().accepts("campfire_fuel").holder())
+        .group("fuel", Slots::single().accepts("#fuel #campfire_starter").holder())
         .group("output", Slots::single().output().holder())
         .recipes(&CAMPFIRE_RECIPE)
         .player_inventory()
@@ -148,6 +148,7 @@ fn tick_furnaces(b: &mut SystemBatch<CampfireCooking>) {
             for entity in entities {
                 if w.entity(entity).unwrap().block_pos() == pos {
                     w.entity_modify(entity).fire(100);
+                    w.damage(entity, Damage::new(1.0, &FIRE));
                 }
             }
             s.burn -= 1;

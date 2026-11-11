@@ -1,0 +1,230 @@
+mod.tetanus.name = Tetanus
+mod.tetanus.description = Adds thirst and temperature mechanics to weft.
+    Credit of this name goes to "fyrstikkeske".
+    Don't step on a rusty nail.
+mod.tetanus.authors = L10nM4st3r
+
+
+command.tetanus.temperature = Set temperature to {0}°C
+command.tetanus.hydrate = Set thirst to {0}
+
+
+death.tetanus.dehydrate = {0} forgot to hydrate
+death.tetanus.heat_exhaustion = {0} died of heat stroke
+death.tetanus.incinerated = {0} went up in flames
+death.tetanus.melted = {0} discovered the melting point of skin
+death.tetanus.hypothermia = {0} felt a little chilly
+
+config.core.damage.tetanus.dehydrate = Dehydration
+config.core.damage.tetanus.heat_exhaustion = Heat Exhaustion
+config.core.damage.tetanus.hypothermia = Hypothermia
+config.core.damage.tetanus.incinerated = Incinerating Heat
+config.core.damage.tetanus.melted = Melting Heat
+config.core.damage.tetanus.dehydrate.tooltip = Part of Tetanus
+config.core.damage.tetanus.heat_exhaustion.tooltip = Part of Tetanus
+config.core.damage.tetanus.hypothermia.tooltip = Part of Tetanus
+config.core.damage.tetanus.incinerated.tooltip = Part of Tetanus (damage dealt when temperature is more than 100 degrees Celsius).
+config.core.damage.tetanus.melted.tooltip = Part of Tetanus (damage dealt when temperature is more than 600 degrees Celsius).
+
+
+item.tetanus.empty_leather_canteen = Empty Leather Canteen
+item.tetanus.filled_leather_canteen = Leather Canteen
+
+
+tetanus.debug_temperature = Temperature (Body: {0}, Environment: {1}, Overlay Frame: {2})
+tetanus.debug = Tetanus
+
+
+config.tetanus.thirst_rate = Thirst Rate
+config.tetanus.thirst_rate.tooltip = The higher this is, the faster they will dehydrate.
+    (Default: 1.0)
+
+config.tetanus.temperature_rate = Temperature Change Rate
+config.tetanus.temperature_rate.tooltip = The higher this is, the faster the player's temperature will shift to match their environment.
+    (Default: 1.0)
+
+config.tetanus.thirst_enabled = Thirst Enabled
+config.tetanus.thirst_enabled.tooltip = Disable this if you would not like to worry about thirst/dehydration mechanics.
+    (Default: On)
+
+config.tetanus.temperature_enabled = Temperature Enabled
+config.tetanus.temperature_enabled.tooltip = Disable this if you would not like to worry about temperature mechanics.
+    (Default: On)
+
+config.tetanus.temperature_update_frequency = Temperature Update Frequency
+config.tetanus.temperature_update_frequency.tooltip = The frequency - in ticks - that player temperature is updated. The higher this is, the lower the lag, but the more delayed updating is when changing environment.
+    (Default: 60)
+
+
+
+
+
+hud.tetanus.cold_cold = {align:center}{img:tetanus:temperature/cold}{/align}
+hud.tetanus.cold_freezing = {align:center}{img:tetanus:temperature/cold_freezing}{/align}
+hud.tetanus.cold_freezing_down_1 = {align:center}{img:tetanus:temperature/cold_freezing_down_1}{/align}
+hud.tetanus.cold_freezing_down_2 = {align:center}{img:tetanus:temperature/cold_freezing_down_2}{/align}
+hud.tetanus.cold_freezing_down_3 = {align:center}{img:tetanus:temperature/cold_freezing_down_3}{/align}
+hud.tetanus.cold_freezing_down_4 = {align:center}{img:tetanus:temperature/cold_freezing_down_4}{/align}
+hud.tetanus.cold_hot = {align:center}{img:tetanus:temperature/cold_hot}{/align}
+hud.tetanus.cold_hot_up_1 = {align:center}{img:tetanus:temperature/cold_hot_up_1}{/align}
+hud.tetanus.cold_hot_up_2 = {align:center}{img:tetanus:temperature/cold_hot_up_2}{/align}
+hud.tetanus.cold_hot_up_3 = {align:center}{img:tetanus:temperature/cold_hot_up_3}{/align}
+hud.tetanus.cold_hot_up_4 = {align:center}{img:tetanus:temperature/cold_hot_up_4}{/align}
+hud.tetanus.cold_normal = {align:center}{img:tetanus:temperature/cold_normal}{/align}
+hud.tetanus.cold_normal_up_1 = {align:center}{img:tetanus:temperature/cold_normal_up_1}{/align}
+hud.tetanus.cold_normal_up_2 = {align:center}{img:tetanus:temperature/cold_normal_up_2}{/align}
+hud.tetanus.cold_normal_up_3 = {align:center}{img:tetanus:temperature/cold_normal_up_3}{/align}
+hud.tetanus.cold_normal_up_4 = {align:center}{img:tetanus:temperature/cold_normal_up_4}{/align}
+hud.tetanus.cold_warm = {align:center}{img:tetanus:temperature/cold_warm}{/align}
+hud.tetanus.cold_warm_up_1 = {align:center}{img:tetanus:temperature/cold_warm_up_1}{/align}
+hud.tetanus.cold_warm_up_2 = {align:center}{img:tetanus:temperature/cold_warm_up_2}{/align}
+hud.tetanus.cold_warm_up_3 = {align:center}{img:tetanus:temperature/cold_warm_up_3}{/align}
+hud.tetanus.cold_warm_up_4 = {align:center}{img:tetanus:temperature/cold_warm_up_4}{/align}
+hud.tetanus.freezing_freezing = {align:center}{img:tetanus:temperature/freezing}{/align}
+hud.tetanus.freezing_cold_overlay_1 = {align:center}{img:tetanus:temperature/freezing_cold_overlay_1}{/align}
+hud.tetanus.freezing_cold_overlay_2 = {align:center}{img:tetanus:temperature/freezing_cold_overlay_2}{/align}
+hud.tetanus.freezing_cold_overlay_3 = {align:center}{img:tetanus:temperature/freezing_cold_overlay_3}{/align}
+hud.tetanus.freezing_cold_overlay_4 = {align:center}{img:tetanus:temperature/freezing_cold_overlay_4}{/align}
+hud.tetanus.freezing_cold = {align:center}{img:tetanus:temperature/freezing_cold}{/align}
+hud.tetanus.freezing_cold_down_1 = {align:center}{img:tetanus:temperature/freezing_cold_down_1}{/align}
+hud.tetanus.freezing_cold_down_2 = {align:center}{img:tetanus:temperature/freezing_cold_down_2}{/align}
+hud.tetanus.freezing_cold_down_3 = {align:center}{img:tetanus:temperature/freezing_cold_down_3}{/align}
+hud.tetanus.freezing_cold_down_4 = {align:center}{img:tetanus:temperature/freezing_cold_down_4}{/align}
+hud.tetanus.freezing_cold_up_1 = {align:center}{img:tetanus:temperature/freezing_cold_up_1}{/align}
+hud.tetanus.freezing_cold_up_2 = {align:center}{img:tetanus:temperature/freezing_cold_up_2}{/align}
+hud.tetanus.freezing_cold_up_3 = {align:center}{img:tetanus:temperature/freezing_cold_up_3}{/align}
+hud.tetanus.freezing_cold_up_4 = {align:center}{img:tetanus:temperature/freezing_cold_up_4}{/align}
+hud.tetanus.freezing_freezing_overlay_1 = {align:center}{img:tetanus:temperature/freezing_freezing_overlay_1}{/align}
+hud.tetanus.freezing_freezing_overlay_2 = {align:center}{img:tetanus:temperature/freezing_freezing_overlay_2}{/align}
+hud.tetanus.freezing_freezing_overlay_3 = {align:center}{img:tetanus:temperature/freezing_freezing_overlay_3}{/align}
+hud.tetanus.freezing_freezing_overlay_4 = {align:center}{img:tetanus:temperature/freezing_freezing_overlay_4}{/align}
+hud.tetanus.freezing_hot_overlay_1 = {align:center}{img:tetanus:temperature/freezing_hot_overlay_1}{/align}
+hud.tetanus.freezing_hot_overlay_2 = {align:center}{img:tetanus:temperature/freezing_hot_overlay_2}{/align}
+hud.tetanus.freezing_hot_overlay_3 = {align:center}{img:tetanus:temperature/freezing_hot_overlay_3}{/align}
+hud.tetanus.freezing_hot_overlay_4 = {align:center}{img:tetanus:temperature/freezing_hot_overlay_4}{/align}
+hud.tetanus.freezing_hot = {align:center}{img:tetanus:temperature/freezing_hot}{/align}
+hud.tetanus.freezing_hot_up_1 = {align:center}{img:tetanus:temperature/freezing_hot_up_1}{/align}
+hud.tetanus.freezing_hot_up_2 = {align:center}{img:tetanus:temperature/freezing_hot_up_2}{/align}
+hud.tetanus.freezing_hot_up_3 = {align:center}{img:tetanus:temperature/freezing_hot_up_3}{/align}
+hud.tetanus.freezing_hot_up_4 = {align:center}{img:tetanus:temperature/freezing_hot_up_4}{/align}
+hud.tetanus.freezing_normal_overlay_1 = {align:center}{img:tetanus:temperature/freezing_normal_overlay_1}{/align}
+hud.tetanus.freezing_normal_overlay_2 = {align:center}{img:tetanus:temperature/freezing_normal_overlay_2}{/align}
+hud.tetanus.freezing_normal_overlay_3 = {align:center}{img:tetanus:temperature/freezing_normal_overlay_3}{/align}
+hud.tetanus.freezing_normal_overlay_4 = {align:center}{img:tetanus:temperature/freezing_normal_overlay_4}{/align}
+hud.tetanus.freezing_normal = {align:center}{img:tetanus:temperature/freezing_normal}{/align}
+hud.tetanus.freezing_normal_up_1 = {align:center}{img:tetanus:temperature/freezing_normal_up_1}{/align}
+hud.tetanus.freezing_normal_up_2 = {align:center}{img:tetanus:temperature/freezing_normal_up_2}{/align}
+hud.tetanus.freezing_normal_up_3 = {align:center}{img:tetanus:temperature/freezing_normal_up_3}{/align}
+hud.tetanus.freezing_normal_up_4 = {align:center}{img:tetanus:temperature/freezing_normal_up_4}{/align}
+hud.tetanus.freezing_warm_overlay_1 = {align:center}{img:tetanus:temperature/freezing_warm_overlay_1}{/align}
+hud.tetanus.freezing_warm_overlay_2 = {align:center}{img:tetanus:temperature/freezing_warm_overlay_2}{/align}
+hud.tetanus.freezing_warm_overlay_3 = {align:center}{img:tetanus:temperature/freezing_warm_overlay_3}{/align}
+hud.tetanus.freezing_warm_overlay_4 = {align:center}{img:tetanus:temperature/freezing_warm_overlay_4}{/align}
+hud.tetanus.freezing_warm = {align:center}{img:tetanus:temperature/freezing_warm}{/align}
+hud.tetanus.freezing_warm_up_1 = {align:center}{img:tetanus:temperature/freezing_warm_up_1}{/align}
+hud.tetanus.freezing_warm_up_2 = {align:center}{img:tetanus:temperature/freezing_warm_up_2}{/align}
+hud.tetanus.freezing_warm_up_3 = {align:center}{img:tetanus:temperature/freezing_warm_up_3}{/align}
+hud.tetanus.freezing_warm_up_4 = {align:center}{img:tetanus:temperature/freezing_warm_up_4}{/align}
+hud.tetanus.hot_hot = {align:center}{img:tetanus:temperature/hot}{/align}
+hud.tetanus.hot_cold_overlay_1 = {align:center}{img:tetanus:temperature/hot_cold_overlay_1}{/align}
+hud.tetanus.hot_cold_overlay_2 = {align:center}{img:tetanus:temperature/hot_cold_overlay_2}{/align}
+hud.tetanus.hot_cold_overlay_3 = {align:center}{img:tetanus:temperature/hot_cold_overlay_3}{/align}
+hud.tetanus.hot_cold_overlay_4 = {align:center}{img:tetanus:temperature/hot_cold_overlay_4}{/align}
+hud.tetanus.hot_cold = {align:center}{img:tetanus:temperature/hot_cold}{/align}
+hud.tetanus.hot_cold_down_1 = {align:center}{img:tetanus:temperature/hot_cold_down_1}{/align}
+hud.tetanus.hot_cold_down_2 = {align:center}{img:tetanus:temperature/hot_cold_down_2}{/align}
+hud.tetanus.hot_cold_down_3 = {align:center}{img:tetanus:temperature/hot_cold_down_3}{/align}
+hud.tetanus.hot_cold_down_4 = {align:center}{img:tetanus:temperature/hot_cold_down_4}{/align}
+hud.tetanus.hot_freezing_overlay_1 = {align:center}{img:tetanus:temperature/hot_freezing_overlay_1}{/align}
+hud.tetanus.hot_freezing_overlay_2 = {align:center}{img:tetanus:temperature/hot_freezing_overlay_2}{/align}
+hud.tetanus.hot_freezing_overlay_3 = {align:center}{img:tetanus:temperature/hot_freezing_overlay_3}{/align}
+hud.tetanus.hot_freezing_overlay_4 = {align:center}{img:tetanus:temperature/hot_freezing_overlay_4}{/align}
+hud.tetanus.hot_freezing = {align:center}{img:tetanus:temperature/hot_freezing}{/align}
+hud.tetanus.hot_freezing_down_1 = {align:center}{img:tetanus:temperature/hot_freezing_down_1}{/align}
+hud.tetanus.hot_freezing_down_2 = {align:center}{img:tetanus:temperature/hot_freezing_down_2}{/align}
+hud.tetanus.hot_freezing_down_3 = {align:center}{img:tetanus:temperature/hot_freezing_down_3}{/align}
+hud.tetanus.hot_freezing_down_4 = {align:center}{img:tetanus:temperature/hot_freezing_down_4}{/align}
+hud.tetanus.hot_hot_overlay_1 = {align:center}{img:tetanus:temperature/hot_hot_overlay_1}{/align}
+hud.tetanus.hot_hot_overlay_2 = {align:center}{img:tetanus:temperature/hot_hot_overlay_2}{/align}
+hud.tetanus.hot_hot_overlay_3 = {align:center}{img:tetanus:temperature/hot_hot_overlay_3}{/align}
+hud.tetanus.hot_hot_overlay_4 = {align:center}{img:tetanus:temperature/hot_hot_overlay_4}{/align}
+hud.tetanus.hot_normal_overlay_1 = {align:center}{img:tetanus:temperature/hot_normal_overlay_1}{/align}
+hud.tetanus.hot_normal_overlay_2 = {align:center}{img:tetanus:temperature/hot_normal_overlay_2}{/align}
+hud.tetanus.hot_normal_overlay_3 = {align:center}{img:tetanus:temperature/hot_normal_overlay_3}{/align}
+hud.tetanus.hot_normal_overlay_4 = {align:center}{img:tetanus:temperature/hot_normal_overlay_4}{/align}
+hud.tetanus.hot_normal = {align:center}{img:tetanus:temperature/hot_normal}{/align}
+hud.tetanus.hot_normal_down_1 = {align:center}{img:tetanus:temperature/hot_normal_down_1}{/align}
+hud.tetanus.hot_normal_down_2 = {align:center}{img:tetanus:temperature/hot_normal_down_2}{/align}
+hud.tetanus.hot_normal_down_3 = {align:center}{img:tetanus:temperature/hot_normal_down_3}{/align}
+hud.tetanus.hot_normal_down_4 = {align:center}{img:tetanus:temperature/hot_normal_down_4}{/align}
+hud.tetanus.hot_warm_overlay_1 = {align:center}{img:tetanus:temperature/hot_warm_overlay_1}{/align}
+hud.tetanus.hot_warm_overlay_2 = {align:center}{img:tetanus:temperature/hot_warm_overlay_2}{/align}
+hud.tetanus.hot_warm_overlay_3 = {align:center}{img:tetanus:temperature/hot_warm_overlay_3}{/align}
+hud.tetanus.hot_warm_overlay_4 = {align:center}{img:tetanus:temperature/hot_warm_overlay_4}{/align}
+hud.tetanus.hot_warm = {align:center}{img:tetanus:temperature/hot_warm}{/align}
+hud.tetanus.hot_warm_down_1 = {align:center}{img:tetanus:temperature/hot_warm_down_1}{/align}
+hud.tetanus.hot_warm_down_2 = {align:center}{img:tetanus:temperature/hot_warm_down_2}{/align}
+hud.tetanus.hot_warm_down_3 = {align:center}{img:tetanus:temperature/hot_warm_down_3}{/align}
+hud.tetanus.hot_warm_down_4 = {align:center}{img:tetanus:temperature/hot_warm_down_4}{/align}
+hud.tetanus.hot_warm_up_1 = {align:center}{img:tetanus:temperature/hot_warm_up_1}{/align}
+hud.tetanus.hot_warm_up_2 = {align:center}{img:tetanus:temperature/hot_warm_up_2}{/align}
+hud.tetanus.hot_warm_up_3 = {align:center}{img:tetanus:temperature/hot_warm_up_3}{/align}
+hud.tetanus.hot_warm_up_4 = {align:center}{img:tetanus:temperature/hot_warm_up_4}{/align}
+hud.tetanus.normal_normal = {align:center}{img:tetanus:temperature/normal}{/align}
+hud.tetanus.normal_cold = {align:center}{img:tetanus:temperature/normal_cold}{/align}
+hud.tetanus.normal_cold_down_1 = {align:center}{img:tetanus:temperature/normal_cold_down_1}{/align}
+hud.tetanus.normal_cold_down_2 = {align:center}{img:tetanus:temperature/normal_cold_down_2}{/align}
+hud.tetanus.normal_cold_down_3 = {align:center}{img:tetanus:temperature/normal_cold_down_3}{/align}
+hud.tetanus.normal_cold_down_4 = {align:center}{img:tetanus:temperature/normal_cold_down_4}{/align}
+hud.tetanus.normal_cold_up_1 = {align:center}{img:tetanus:temperature/normal_cold_up_1}{/align}
+hud.tetanus.normal_cold_up_2 = {align:center}{img:tetanus:temperature/normal_cold_up_2}{/align}
+hud.tetanus.normal_cold_up_3 = {align:center}{img:tetanus:temperature/normal_cold_up_3}{/align}
+hud.tetanus.normal_cold_up_4 = {align:center}{img:tetanus:temperature/normal_cold_up_4}{/align}
+hud.tetanus.normal_freezing = {align:center}{img:tetanus:temperature/normal_freezing}{/align}
+hud.tetanus.normal_freezing_down_1 = {align:center}{img:tetanus:temperature/normal_freezing_down_1}{/align}
+hud.tetanus.normal_freezing_down_2 = {align:center}{img:tetanus:temperature/normal_freezing_down_2}{/align}
+hud.tetanus.normal_freezing_down_3 = {align:center}{img:tetanus:temperature/normal_freezing_down_3}{/align}
+hud.tetanus.normal_freezing_down_4 = {align:center}{img:tetanus:temperature/normal_freezing_down_4}{/align}
+hud.tetanus.normal_freezing_up_1 = {align:center}{img:tetanus:temperature/normal_freezing_up_1}{/align}
+hud.tetanus.normal_freezing_up_2 = {align:center}{img:tetanus:temperature/normal_freezing_up_2}{/align}
+hud.tetanus.normal_freezing_up_3 = {align:center}{img:tetanus:temperature/normal_freezing_up_3}{/align}
+hud.tetanus.normal_freezing_up_4 = {align:center}{img:tetanus:temperature/normal_freezing_up_4}{/align}
+hud.tetanus.normal_hot = {align:center}{img:tetanus:temperature/normal_hot}{/align}
+hud.tetanus.normal_hot_down_1 = {align:center}{img:tetanus:temperature/normal_hot_down_1}{/align}
+hud.tetanus.normal_hot_down_2 = {align:center}{img:tetanus:temperature/normal_hot_down_2}{/align}
+hud.tetanus.normal_hot_down_3 = {align:center}{img:tetanus:temperature/normal_hot_down_3}{/align}
+hud.tetanus.normal_hot_down_4 = {align:center}{img:tetanus:temperature/normal_hot_down_4}{/align}
+hud.tetanus.normal_hot_up_1 = {align:center}{img:tetanus:temperature/normal_hot_up_1}{/align}
+hud.tetanus.normal_hot_up_2 = {align:center}{img:tetanus:temperature/normal_hot_up_2}{/align}
+hud.tetanus.normal_hot_up_3 = {align:center}{img:tetanus:temperature/normal_hot_up_3}{/align}
+hud.tetanus.normal_hot_up_4 = {align:center}{img:tetanus:temperature/normal_hot_up_4}{/align}
+hud.tetanus.normal_warm = {align:center}{img:tetanus:temperature/normal_warm}{/align}
+hud.tetanus.normal_warm_down_1 = {align:center}{img:tetanus:temperature/normal_warm_down_1}{/align}
+hud.tetanus.normal_warm_down_2 = {align:center}{img:tetanus:temperature/normal_warm_down_2}{/align}
+hud.tetanus.normal_warm_down_3 = {align:center}{img:tetanus:temperature/normal_warm_down_3}{/align}
+hud.tetanus.normal_warm_down_4 = {align:center}{img:tetanus:temperature/normal_warm_down_4}{/align}
+hud.tetanus.normal_warm_up_1 = {align:center}{img:tetanus:temperature/normal_warm_up_1}{/align}
+hud.tetanus.normal_warm_up_2 = {align:center}{img:tetanus:temperature/normal_warm_up_2}{/align}
+hud.tetanus.normal_warm_up_3 = {align:center}{img:tetanus:temperature/normal_warm_up_3}{/align}
+hud.tetanus.normal_warm_up_4 = {align:center}{img:tetanus:temperature/normal_warm_up_4}{/align}
+hud.tetanus.warm_warm = {align:center}{img:tetanus:temperature/warm}{/align}
+hud.tetanus.warm_cold = {align:center}{img:tetanus:temperature/warm_cold}{/align}
+hud.tetanus.warm_cold_down_1 = {align:center}{img:tetanus:temperature/warm_cold_down_1}{/align}
+hud.tetanus.warm_cold_down_2 = {align:center}{img:tetanus:temperature/warm_cold_down_2}{/align}
+hud.tetanus.warm_cold_down_3 = {align:center}{img:tetanus:temperature/warm_cold_down_3}{/align}
+hud.tetanus.warm_cold_down_4 = {align:center}{img:tetanus:temperature/warm_cold_down_4}{/align}
+hud.tetanus.warm_freezing = {align:center}{img:tetanus:temperature/warm_freezing}{/align}
+hud.tetanus.warm_freezing_down_1 = {align:center}{img:tetanus:temperature/warm_freezing_down_1}{/align}
+hud.tetanus.warm_freezing_down_2 = {align:center}{img:tetanus:temperature/warm_freezing_down_2}{/align}
+hud.tetanus.warm_freezing_down_3 = {align:center}{img:tetanus:temperature/warm_freezing_down_3}{/align}
+hud.tetanus.warm_freezing_down_4 = {align:center}{img:tetanus:temperature/warm_freezing_down_4}{/align}
+hud.tetanus.warm_hot = {align:center}{img:tetanus:temperature/warm_hot}{/align}
+hud.tetanus.warm_hot_up_1 = {align:center}{img:tetanus:temperature/warm_hot_up_1}{/align}
+hud.tetanus.warm_hot_up_2 = {align:center}{img:tetanus:temperature/warm_hot_up_2}{/align}
+hud.tetanus.warm_hot_up_3 = {align:center}{img:tetanus:temperature/warm_hot_up_3}{/align}
+hud.tetanus.warm_hot_up_4 = {align:center}{img:tetanus:temperature/warm_hot_up_4}{/align}
+hud.tetanus.warm_normal = {align:center}{img:tetanus:temperature/warm_normal}{/align}
+hud.tetanus.warm_normal_down_1 = {align:center}{img:tetanus:temperature/warm_normal_down_1}{/align}
+hud.tetanus.warm_normal_down_2 = {align:center}{img:tetanus:temperature/warm_normal_down_2}{/align}
+hud.tetanus.warm_normal_down_3 = {align:center}{img:tetanus:temperature/warm_normal_down_3}{/align}
+hud.tetanus.warm_normal_down_4 = {align:center}{img:tetanus:temperature/warm_normal_down_4}{/align}

@@ -32,7 +32,6 @@ fn plant<'a>(r: &'a mut Registry, handle: &'static Block, soil: &str, (min, max)
         .needs_below(soil)
         .tab(&NATURAL)
 }
-
 pub fn register(r: &mut Registry) {
     // Lying on the ground, turned the way it was placed. Picked up as itself; burns and crafts
     // like a stick.
@@ -108,21 +107,6 @@ pub fn register(r: &mut Registry) {
         .model_box([1.0, 5.0, 11.0], [13.0, 7.0, 16.0])
         .model_box([2.0, 9.0, 11.0], [14.0, 11.0, 16.0])
         .needs(Dir::South, "")
-        .tab(&NATURAL);
-
-    // A hollow log of every log, any mod's.
-    r.shapes_of("hollow_log", "#logs", "_hollow")
-        .sound_group("base:block.wood")
-        .model_file("hollow_log")
-        .model_texture("inside", "base_oak_log_inner")
-        //.model_texture("inside", "beauty_of_nature:block/{source}_inner")
-        .axis()
-        .signal_blocker()
-        .shares_cell_with("#water")
-        .liquid_walls(&[Dir::North, Dir::South, Dir::East, Dir::West])
-        .outline([0.0; 3], [16.0; 3])
-        .outline([2.0, 0.0, 2.0], [14.0, 16.0, 14.0])
-        .tag("hollow_log")
         .tab(&NATURAL);
 
     // Cactus grows a flower once it is three tall.

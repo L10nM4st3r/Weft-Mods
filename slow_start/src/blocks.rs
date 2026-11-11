@@ -79,6 +79,7 @@ fn do_brick_behaviour(block: BlockBuilder) {
         .prop("x", 1..=8)
         .prop("y", 1..=8)
         .prop("z", 1..=8)
+        .cull_same()
         .states(|p: &Props, s| {
             let x = p.get("x").parse::<f32>().unwrap() * 2.0;
             let y = p.get("y").parse::<f32>().unwrap() * 2.0;

@@ -3,7 +3,7 @@
 
 use base_api::OVERWORLD;
 use weft_sdk::noise::{hash, unit};
-use weft_sdk::terrain::Site;
+use weft_sdk::terrain::{Caves, Expr, preset};
 use weft_sdk::*;
 
 pub const SEA: i32 = 63;
@@ -24,11 +24,10 @@ static CROP_COVER: Component<f32> = Component::named("crop_cover");
 static CROPS: Component<BlockList> = Component::named("crops");
 static STONE: Tag = Tag::named("stone_ore_replaceables");
 
-static BRANCHES_SCATTER: Scatter = Scatter::named("branches");
-static PEBBLES_SCATTER: Scatter = Scatter::named("pebbles");
-static WILD_CROPS_SCATTER: Scatter = Scatter::named("wild_crops");
+static BRANCHES_SCATTER: Feature = Feature::named("branches");
+static PEBBLES_SCATTER: Feature = Feature::named("pebbles");
+static WILD_CROPS_SCATTER: Feature = Feature::named("wild_crops");
 
-static SAND: Block = Block::named("base:sand");
 static GRAVEL: Block = Block::named("base:gravel");
 //static BIRCH_LOG: Block = Block::named("base:birch_log");
 
@@ -71,38 +70,65 @@ pub fn register(r: &mut Registry) {
             b.set_text(&FLOWERS, f);
         }
     }
-    let crop = |site: &Site| {
+
+    let crop = |site: &Plan| {
         CROPS
             .on_biome(site.biome())
             .and_then(|l| l.pick(site.random()))
     };
-    let pebble = |site: &Site| {
+    let pebble = |site: &Plan| {
         PEBBLE_LIST
             .on_biome(site.biome())
             .and_then(|l| l.pick(site.random()))
     };
-    let scatters: [(&'static Scatter, &'static Component<f32>, &str, fn(&Site) -> Option<u32>); 3] = [
+    let scatters: [(&'static Feature, &'static Component<f32>, &str, fn(&Plan) -> Option<u32>); 3] = [
         (&BRANCHES_SCATTER, &BRANCH_COVER, "", |_| Some(BRANCH.id())),
         (&PEBBLES_SCATTER, &PEBBLE_COVER, "", pebble),
         (&WILD_CROPS_SCATTER, &CROP_COVER, "#desert_plant_soil", crop),
     ];
+
     for (scatter, cover, ground, pick) in scatters {
         let s = r
             .scatter(scatter)
-            .cell(1)
             .density(cover)
-            .dimension(&OVERWORLD);
-        let s = if ground.is_empty() { s } else { s.ground(ground) };
+            .turns()
+            //cells(1)
+            .dimension(&OVERWORLD)
+            .plan(move |site| {
+                if let Some(what) = pick(site) {
+                    site.put(site.pos(), what);
+                }
+            });
 
-        s.shape(move |site| {
-            if let Some(what) = pick(site) {
-                site.put(site.pos(), what);
-            }
-        });
+        if !ground.is_empty() {
+            s.ground(ground);
+        };
+    }
+
+    r.ore(&GRAVEL)
+        .chance(0.1)
+        .spacing(16)
+        .vein(Vein::disk(4.0, 3.0))
+        .ground("base:sand")
+        .over_water()
+        .replaces("base:sand");
+
+    if r.has_mod("tetanus") {
+        r.edit::<kind::Dimension>(&OVERWORLD).set(
+            &tetanus_api::TETANUS_DIMENSION,
+            tetanus_api::TetanusDimension {
+                temperature: [15.0, 10.0],
+                underground_temperature: 2450.0,
+                underground_height: [40.0, -2_000_000.0],
+                deep_underground_temperature: 5450.0,
+                deep_underground_height: [-2_000_000.0, -6_000_000.0],
+                elevated_temperature: -10.0,
+                elevated_height: [80.0, 512.0],
+            },
+        );
     }
 
     r.decoration(rock_layers).dimension(&OVERWORLD);
-    r.decoration(surface_decorator).dimension(&OVERWORLD);
 
     // Base's ores, deeper and with a block of their own where a vein goes through dense rock.
     for ((ore, ..), (min_y, max_y, veins, size, exposed)) in ORES.iter().zip([
@@ -110,7 +136,7 @@ pub fn register(r: &mut Registry) {
         (-128, 128, 4, 5, 0.0),
         (CRUST_BOTTOM, -16, 2, 7, 0.5),
         (CRUST_BOTTOM / 2, 6, 4, 8, 0.0),
-        (CRUST_BOTTOM, 0, 3, 6, 0.5),
+        (CRUST_BOTTOM, 0, 3, 2, 0.5),
     ]) {
         let dense = Block::generated(format!("dense_rock_{ore}_ore"));
         let super_dense = Block::generated(format!("super_dense_rock_{ore}_ore"));
@@ -118,13 +144,45 @@ pub fn register(r: &mut Registry) {
 
         r.edit(Block::generated(format!("base:{ore}_ore")).ore())
             .y(min_y, max_y)
-            .veins(veins)
+            .per_cube(veins)
             .vein_size(size)
             .exposed(exposed)
+            .replaces("base:stone")
             .replaces_with("#dense_rock_ore_replaceables", dense)
             .replaces_with("#super_dense_rock_ore_replaceables", super_dense)
             .replaces_with("#ultra_dense_rock_ore_replaceables", ultra_dense);
     }
+
+    r.edit::<kind::Terrain>(OVERWORLD.terrain())
+        .landform(preset::continents(-200.0))
+        //.landform(preset::mountains(15.0, 100.0))
+        .landform(preset::mountains(50.0, 800.0));
+    //     .;
+    //     .feature(preset::continents(18.0))
+    //     // Biomes shape the land through their climate, not their borders, so nothing seams:
+    //     // the cold flattens hills into tundra, deserts get dunes.
+    //     .feature(preset::hills(16.0, 110.0).mask(Expr::temperature().ramp(-0.35, -0.6).not()))
+    //     .feature(
+    //         preset::dunes(4.0, 26.0).mask(
+    //             Expr::temperature()
+    //                 .ramp(0.25, 0.45)
+    //                 .and(Expr::humidity().ramp(0.1, -0.05)),
+    //         ),
+    //     )
+    //     // How mountainous a place is: the mountains' strength, and where the mountains biome goes.
+    //     .field(
+    //         "base:mountains",
+    //         Expr::fbm(0x44, 800.0, 3)
+    //             .ramp(-0.0, 0.4)
+    //             .and(Expr::continent().ramp(0.0, 0.05)),
+    //     )
+    //     .feature(
+    //         preset::mountains(200.0, 600.0)
+    //             .mask(Expr::field("base:mountains"))
+    //             .named("mountains"),
+    //     )
+    //     .feature(preset::continents(-170.0))
+    //     .caves(Caves::new("base:lava", i32::MIN, -256));
 }
 
 /// Create multiple layers of different rocks.
@@ -165,79 +223,55 @@ fn rock_layers(g: &mut Gen) {
     }
 }
 
-pub fn surface_decorator(g: &mut Gen) {
-    let Some(&cols) = g.columns() else { return };
-    let seed = g.seed();
-    let BlockPos { x: ox, y: oy, z: oz } = g.origin();
-
-    if oy < 40 || oy > 256 {
-        return;
-    }
-
-    for z in 0..16usize {
-        for x in 0..16usize {
-            // for y in 0..16usize {
-            //     let (wx, wy, wz) = (ox + x as i32, oy + y as i32, oz + z as i32);
-            //     let h = hash(seed ^ 0xF10, wx as i64, wy as i64, wz as i64);
-            //     let roll = unit(h);
-
-            //     if g.get(x, y, z) == 0 {
-            //         continue;
-            //     }
-
-            //     if g.get(x, y, z) == BIRCH_LOG.id() {
-            //         for (new_x, new_z, _facing) in [
-            //             (x + 1, z, Dir::East),
-            //             (x, z + 1, Dir::South),
-            //             (x - 1, z, Dir::West),
-            //             (x, z - 1, Dir::North)
-            //         ] {
-            //             if g.get(new_x, y, new_z) == 0 {
-            //                 let (nwx, nwz) = (ox + new_x as i32, oz + new_z as i32);
-            //                 let new_h = hash(seed ^ 0xF10, nwx as i64, wy as i64, nwz as i64);
-            //                 let new_roll = unit(new_h);
-
-            //                 if new_roll < 0.1 {
-            //                     g.set(new_x, y, new_z, BROWN_SHELF_MUSHROOM.id());
-            //                     //g.set_prop(new_x, y, new_z, "facing", facing);
-            //                 }
-            //             }
-            //         }
-
-            //         continue;
-            //     }
-
-            //     let max_height = (roll * 10.0).round() as i32;
-
-            //     if wy < 0 + max_height {
-            //         g.set(x, y, z, DENSE_ROCK.id());
-            //     }
-
-            // }
-
-            // gravel patches in shallow water (rivers, lakes, ocean shores), replacing the top blocks in
-            // bodies of water
-            let col = &cols[z * 16 + x];
-            // Make sure we only generate clay patches in shallower waters
-            if col.height >= SEA || col.height < SEA - 6 {
-                continue;
-            }
-            let y = col.height - oy;
-            if !(0..16).contains(&y) {
-                continue;
-            }
-            let y = y as usize;
-            let (wx, wz) = (ox + x as i32, oz + z as i32);
-            // Clay patch size based on noise scale
-            let new_h = hash(seed ^ 0xF10, wx as i64, 4, wz as i64);
-            let gravel = unit(new_h);
-            // Threshold for clay generation
-            if gravel > 0.9 {
-                let surface = g.get(x, y, z);
-                if SAND.is(surface) {
-                    g.set(x, y, z, GRAVEL.id());
-                }
-            }
-        }
-    }
-}
+// pub fn surface_decorator(g: &mut Gen) {
+//     let Some(&cols) = g.columns() else { return };
+//     let seed = g.seed();
+//     let BlockPos { x: ox, y: oy, z: oz } = g.origin();
+//
+//     if oy < 40 || oy > 256 {
+//         return;
+//     }
+//
+//     for z in 0..16usize {
+//         for x in 0..16usize {
+//             // for y in 0..16usize {
+//             //     let (wx, wy, wz) = (ox + x as i32, oy + y as i32, oz + z as i32);
+//             //     let h = hash(seed ^ 0xF10, wx as i64, wy as i64, wz as i64);
+//             //     let roll = unit(h);
+//
+//             //     if g.get(x, y, z) == 0 {
+//             //         continue;
+//             //     }
+//
+//             //     if g.get(x, y, z) == BIRCH_LOG.id() {
+//             //         for (new_x, new_z, _facing) in [
+//             //             (x + 1, z, Dir::East),
+//             //             (x, z + 1, Dir::South),
+//             //             (x - 1, z, Dir::West),
+//             //             (x, z - 1, Dir::North)
+//             //         ] {
+//             //             if g.get(new_x, y, new_z) == 0 {
+//             //                 let (nwx, nwz) = (ox + new_x as i32, oz + new_z as i32);
+//             //                 let new_h = hash(seed ^ 0xF10, nwx as i64, wy as i64, nwz as i64);
+//             //                 let new_roll = unit(new_h);
+//
+//             //                 if new_roll < 0.1 {
+//             //                     g.set(new_x, y, new_z, BROWN_SHELF_MUSHROOM.id());
+//             //                     //g.set_prop(new_x, y, new_z, "facing", facing);
+//             //                 }
+//             //             }
+//             //         }
+//
+//             //         continue;
+//             //     }
+//
+//             //     let max_height = (roll * 10.0).round() as i32;
+//
+//             //     if wy < 0 + max_height {
+//             //         g.set(x, y, z, DENSE_ROCK.id());
+//             //     }
+//
+//             // }
+//         }
+//     }
+// }

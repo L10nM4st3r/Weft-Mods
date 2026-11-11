@@ -27,3 +27,5 @@ block.slow_start.raw_clay_single_brick.tooltip = {on_key:!core:sneak}{lang:toolt
 block.slow_start.single_brick = Brick
 block.slow_start.campfire_base = Campfire Base
 block.slow_start.campfire_base.tooltip = {on_key:!core:sneak}{lang:tooltip.more}{/on_key}{on_key:core:sneak}Place one of these on top of another to create a campfire.{/on_key}
+
+tagged.fuel = Adds {value/20} seconds of fuel

@@ -195,3 +195,21 @@ value! {
 
 /// Tough as rust settings for a liquid block. These settings only apply to the player when standing inside the liquid.
 pub static TETANUS_BLOCK_LIQUID: Component<TetanusBlockLiquid> = Component::named("tetanus:block_liquid");
+
+value! {
+    /// Tough as rust settings for a liquid block. These settings only apply to the player when standing inside the liquid.
+    pub struct TetanusArmour {
+        /// Higher values above 0 will increase how long it takes body temperature to move to the enviromental one.
+        /// Lower values have the opposite effect.
+        pub insulation: f32,
+        /// Cools the wearer down by up to this much, without going below 26 degrees celcius.
+        pub heat_resistance: f32,
+        /// Warms the wearer up by up to this much, without going above 16 degrees celcius.
+        pub cold_resistance: f32,
+        /// Flat change to the wearer's temperature.
+        pub temperature: bool
+    }
+}
+
+/// Tough as rust settings for a liquid block. These settings only apply to the player when standing inside the liquid.
+pub static TETANUS_ARMOUR: Component<TetanusArmour> = Component::named("tetanus:armour");

@@ -15,6 +15,11 @@ pub fn register(r: &mut Registry) {
     r.remove(&Recipe::named("base:woodcutter"));
     r.remove(&Recipe::named("beauty_of_nature:crafting/cobblestone"));
 
+    if r.has_mod("tetanus") {
+        r.remove(&Recipe::named("tetanus:empty_leather_canteen"));
+        r.shaped(&CRAFTING, "tetanus:empty_leather_canteen", 1, &["##", "##"], &[('#', "#materials/leather")]);
+    }
+
     // Add new recipes
     r.shaped(&CRAFTING, "base:bricks", 1, &["##", "##"], &[('#', "single_brick")]);
     r.shaped(&CRAFTING, "base:woodcutter", 1, &["ii", "##"], &[('#', "#logs"), ('i', "#materials/iron")]);

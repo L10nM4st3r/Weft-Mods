@@ -4,8 +4,8 @@ version = "0.1.1"
 edition = "2024"
 
 [dependencies]
-weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master", tag=v26.11.4 }
-base_api = { git = "https://github.com/Weft-Rust/Weft", branch = "master", tag=v26.11.4 }
+weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master", tag="v26.11.4" }
+base_api = { git = "https://github.com/Weft-Rust/Weft", branch = "master", tag="v26.11.4" }
 lion_lib = { path = "lion_lib" }
 slow_start_api = { path = "slow_start/api" }
 tetanus_api = { path = "tetanus/api" }

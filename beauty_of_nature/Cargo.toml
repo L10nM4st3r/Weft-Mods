@@ -12,6 +12,7 @@ crate-type = ["cdylib"]
 [dependencies]
 weft_sdk = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
 base_api = { git = "https://github.com/Weft-Rust/Weft", branch = "master" }
+tetanus_api = { path = "../tetanus/api" }
 
 
 [workspace]

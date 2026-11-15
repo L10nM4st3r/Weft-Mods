@@ -2,6 +2,7 @@
 //! (scatters, by biome), and dense rock deep down with ores of its own.
 
 use base_api::OVERWORLD;
+use weft_sdk::ai::Goals;
 use weft_sdk::noise::{hash, unit};
 use weft_sdk::terrain::{BiomeRule, Expr, preset};
 use weft_sdk::*;
@@ -106,7 +107,6 @@ pub fn register(r: &mut Registry) {
         (&WILD_CROPS_SCATTER, &CROP_COVER, "#desert_plant_soil", crop),
     ];
 
-    //////////////////// Stopped game from launching.
     for (scatter, cover, ground, pick) in scatters {
         let s = r
             .scatter(scatter)
@@ -155,7 +155,6 @@ pub fn register(r: &mut Registry) {
 
     // Base's ores, deeper and with a block of their own where a vein goes through dense rock.
     //
-    //////////////////// Stopped game from launching.
     for ((ore, ..), (min_y, max_y, veins, size, exposed)) in ORES.iter().zip([
         (-128, 128, 6, 8, 0.0),
         (-128, 128, 4, 5, 0.0),
@@ -186,7 +185,6 @@ pub fn register(r: &mut Registry) {
 
     // Structure features
 
-    //////////////////// Stopped game from launching.
     r.feature(&ABANDONED_HOUSE_1_FEATURE)
         .foundation(&DIRT)
         .chance(0.01)

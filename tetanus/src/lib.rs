@@ -1,10 +1,10 @@
 //use base_api::{FOOD, HUNGER};
 use base_api::{CRAFTING, FLATLANDS, OVERWORLD, tabs::TOOLS};
 use tetanus_api::{
-    CANTEEN, CANTEEN_OTHER, Canteen, DEFAULT_BIOME, TEMPERATURE, TETANUS_BIOME, TETANUS_BLOCK_LIQUID, TETANUS_DIMENSION, THIRST,
-    Temperature, TetanusBiome, TetanusBlockLiquid, TetanusDimension, Thirst,
+    CANTEEN, CANTEEN_OTHER, Canteen, DRINK, TEMPERATURE, TETANUS_BIOME, TETANUS_BLOCK_LIQUID, TETANUS_DIMENSION, THIRST, Temperature,
+    TetanusBiome, TetanusBlockLiquid, TetanusDimension, Thirst, get_block_temperature,
 };
-use weft_sdk::{comps::dimension::DAY_LENGTH, *};
+use weft_sdk::*;
 
 declare_mod!(deps: ["base"], init: init);
 
@@ -17,6 +17,9 @@ static HUD_TEMPERATURE: HudElement = HudElement::named("temperature");
 static DEBUG_PANEL: HudElement = HudElement::named("debug");
 /// Speed of which temperature moves towards the environmental temperature.
 static TEMPERATURE_RATE: Attribute = Attribute::named("temperature_rate");
+static ATTRIBUTE_HEAT_RESISTANCE: Attribute = Attribute::named("heat_resistance");
+static ATTRIBUTE_COLD_RESISTANCE: Attribute = Attribute::named("cold_resistance");
+static ATTRIBUTE_BASE_TEMPERATURE: Attribute = Attribute::named("base_temperature");
 
 pub static DEHYDRATE: DamageCause = DamageCause::named("tetanus:dehydrate");
 pub static HEAT_EXHAUSTION: DamageCause = DamageCause::named("tetanus:heat_exhaustion");
@@ -46,8 +49,8 @@ pub static DEEP_CAVES: Biome = Biome::named("base:deep_caves");
 // Make campfires deal damage as well as set mob on fire
 
 fn init(r: &mut Registry) {
-    // OVERWORLD
-    // FLATLANDS
+    ////////////////////////////////////////////////////////
+    // Configs
     r.config(&THIRST_ENABLED).bool(true).world();
     r.config(&TEMPERATURE_ENABLED).bool(true).world();
     r.config(&TEMPERATURE_UPDATE_FREQUENCY)
@@ -55,6 +58,8 @@ fn init(r: &mut Registry) {
         .int(60, 5, 100)
         .step(5.0);
 
+    ////////////////////////////////////////////////////////
+    // Items
     r.item(&EMPTY_LEATHER_CANTEEN)
         .tab(&TOOLS)
         .max_stack(1)
@@ -71,8 +76,12 @@ fn init(r: &mut Registry) {
         .set_text(&CANTEEN_OTHER, "tetanus:empty_leather_canteen")
         .on_use(tetanus_api::drink_canteen);
 
+    ////////////////////////////////////////////////////////
+    // Crafting
     r.shaped(&CRAFTING, "empty_leather_canteen", 1, &[" # ", "# #", " # "], &[('#', "#materials/leather")]);
 
+    ////////////////////////////////////////////////////////
+    // Damage types
     r.damage_cause(&DEHYDRATE)
         .bypasses_armor()
         .ignores_cooldown()
@@ -100,6 +109,74 @@ fn init(r: &mut Registry) {
         .no_knockback()
         .death_message("death.tetanus.hypothermia");
 
+    ////////////////////////////////////////////////////////
+    // Liquids
+    //     r.edit_pattern::<kind::Block>("#water").set(
+    //         &TETANUS_BLOCK_LIQUID,
+    //         TetanusBlockLiquid { temperature: -10.0, max_temperature: f32::MAX, min_temperature: -f32::MAX, temperature_limits_forced: false },
+    //     );
+    //
+    //     r.edit_pattern::<kind::Block>("#lava").set(
+    //         &TETANUS_BLOCK_LIQUID,
+    //         TetanusBlockLiquid { temperature: 180.0, max_temperature: f32::MAX, min_temperature: 180.0, temperature_limits_forced: true },
+    //     );
+
+    ////////////////////////////////////////////////////////
+    // Armour
+    r.edit_pattern::<kind::Item>("#armor_head/leather")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.2 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.5 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_chest/leather")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.2 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.8 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_legs/leather")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.2 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.4 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_feet/leather")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.2 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.5 as f64).worn());
+
+    r.edit_pattern::<kind::Item>("#armor_head/iron")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.4 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.8 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_chest/iron")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.4 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 1.1 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_legs/iron")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.4 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.7 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_feet/iron")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.4 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.8 as f64).worn());
+
+    r.edit_pattern::<kind::Item>("#armor_head/gold")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.4 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.8 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_chest/gold")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.4 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 1.1 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_legs/gold")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.4 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.7 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_feet/gold")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, -0.4 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, 0.8 as f64).worn());
+
+    r.edit_pattern::<kind::Item>("#armor_head/diamond")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, 0.1 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, -0.8 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_chest/diamond")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, 0.1 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, -1.1 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_legs/diamond")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, 0.1 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, -0.7 as f64).worn());
+    r.edit_pattern::<kind::Item>("#armor_feet/diamond")
+        .modifier(Modifier::add(&TEMPERATURE_RATE, 0.1 as f64).worn())
+        .modifier(Modifier::add(&ATTRIBUTE_BASE_TEMPERATURE, -0.8 as f64).worn());
+
+    ////////////////////////////////////////////////////////
+    // Dimensions
     r.edit::<kind::Dimension>(&OVERWORLD).set(
         &TETANUS_DIMENSION,
         TetanusDimension {
@@ -125,16 +202,8 @@ fn init(r: &mut Registry) {
         },
     );
 
-    r.edit_pattern::<kind::Block>("#water").set(
-        &TETANUS_BLOCK_LIQUID,
-        TetanusBlockLiquid { temperature: -10.0, max_temperature: f32::MAX, min_temperature: -f32::MAX, temperature_limits_forced: false },
-    );
-
-    r.edit_pattern::<kind::Block>("#lava").set(
-        &TETANUS_BLOCK_LIQUID,
-        TetanusBlockLiquid { temperature: 180.0, max_temperature: f32::MAX, min_temperature: 180.0, temperature_limits_forced: true },
-    );
-
+    ////////////////////////////////////////////////////////
+    // Biomes
     r.edit::<kind::Biome>(&PLAINS)
         .set(&TETANUS_BIOME, TetanusBiome { temperature: [5.0; 2], underground: false, water_is_clean: true });
     r.edit::<kind::Biome>(&FOREST)
@@ -154,6 +223,8 @@ fn init(r: &mut Registry) {
     r.edit::<kind::Biome>(&BEACH)
         .set(&TETANUS_BIOME, TetanusBiome { temperature: [5.0, -2.0], underground: false, water_is_clean: false });
 
+    ////////////////////////////////////////////////////////
+    // Components
     r.entity_component(
         &TEMPERATURE,
         Temperature {
@@ -188,14 +259,24 @@ fn init(r: &mut Registry) {
         })
     });
 
+    ////////////////////////////////////////////////////////
+    // Attributes
     r.attribute(&THIRST_RATE, 1.0, 0.0, 10.0).rule();
     r.attribute(&TEMPERATURE_RATE, 1.0, 0.0, 10.0).rule();
-    r.edit(&PLAYER)
+    r.attribute(&ATTRIBUTE_BASE_TEMPERATURE, 0.0, -1000.0, 1000.0)
+        .rule();
+    r.attribute(&ATTRIBUTE_HEAT_RESISTANCE, 0.0, -1000.0, 1000.0);
+    r.attribute(&ATTRIBUTE_COLD_RESISTANCE, 0.0, -1000.0, 1000.0);
+
+    r.edit::<kind::Entity>(&PLAYER)
         .attach(&THIRST)
         .attach(&TEMPERATURE)
         .modifier(Modifier::add(&attribute::CAN_SPRINT, -1.0).when(&THIRSTY))
-        .modifier(Modifier::add(&attribute::MOVEMENT_SPEED, 0.8).when(&COLD));
+        .modifier(Modifier::add(&attribute::CAN_SPRINT, -1.0).when(&COLD))
+        .modifier(Modifier::add(&attribute::MOVEMENT_SPEED, -0.3).when(&COLD));
 
+    ////////////////////////////////////////////////////////
+    // Ticking and HUD
     r.world_tick(tick_players);
     r.on_event(&actions::BREAK_BLOCK, |b| {
         let w = b.world();
@@ -273,17 +354,21 @@ fn init(r: &mut Registry) {
             }
             _ => 0.0,
         })
-        .overlay(|c| c.component(&THIRST).map_or(0.0, |h| h.wet_throat.ceil()));
+        .overlay(|c| c.component(&THIRST).map_or(0.0, |h| h.wet_throat.ceil()))
         // What the food in hand would fill, fading in and out.
-        // .preview(1.6, |c| {
-        //     let held = c
-        //         .player_state()
-        //         .map_or(ItemStack::EMPTY, |s| c.inventory_slot(s.selected));
-        //     match (c.component(&THIRST), DRINK.on_item(held.item)) {
-        //         (Some(h), Some(f)) => (h.thirst + f.thirst as f32).min(20.0),
-        //         _ => 0.0,
-        //     }
-        // });
+        .preview(1.6, |c| {
+            let held = c
+                .player_state()
+                .map_or(ItemStack::EMPTY, |s| c.inventory_slot(s.selected));
+            let out = match (c.component(&THIRST), DRINK.on_item(held.item)) {
+                (Some(h), Some(f)) => (h.thirst + f.thirst as f32).min(20.0),
+                _ => 0.0,
+            };
+            out + match (c.component(&THIRST), CANTEEN.on_item(held.item)) {
+                (Some(h), Some(f)) => (h.thirst + f.thirst as f32).min(20.0),
+                _ => 0.0,
+            }
+        });
     });
 
     r.hud_element(&DEBUG_PANEL, hud_anchor::DEBUG_LEFT, 0, |ui| {
@@ -304,6 +389,8 @@ fn init(r: &mut Registry) {
         });
     });
 
+    ////////////////////////////////////////////////////////
+    // Commands
     r.command("hydrate", "[thirst:int]", |cmd| {
         let food = cmd.int("thirst").unwrap_or(20).clamp(0, 20) as f32;
         if let Some(h) = cmd.world().component_mut(cmd.player(), &THIRST) {
@@ -320,87 +407,6 @@ fn init(r: &mut Registry) {
         }
         cmd.reply("command.tetanus.temperature", &[Arg::Int(temperature as i64)]);
     });
-}
-
-fn get_local_temperature(w: &World, pos: BlockPos) -> f32 {
-    let (biome, dimension) = (w.biome(pos), w.dimension());
-    let biome_data_option = TETANUS_BIOME.on_biome(biome);
-
-    let biome_data: TetanusBiome;
-    if biome_data_option.is_none() {
-        biome_data = DEFAULT_BIOME;
-    } else {
-        biome_data = biome_data_option.unwrap();
-    }
-
-    let Some(dimension_data) = TETANUS_DIMENSION.on_dimension(dimension) else { return 0.0 };
-    let day_length = DAY_LENGTH.on_dimension(dimension).unwrap_or(24000) as u64;
-
-    // Time of day temperature
-    let time_of_day = wrap_u64(w.day_time(), 0, day_length);
-    let is_day = time_of_day < (day_length as f32 * 0.55) as u64;
-
-    let mut temperature = if is_day {
-        dimension_data.temperature[0] + biome_data.temperature[0]
-    } else {
-        dimension_data.temperature[1] + biome_data.temperature[1]
-    };
-
-    // Elevation temperature
-    temperature += linear(pos.y as f32, dimension_data.elevated_height, [0.0, dimension_data.elevated_temperature]);
-
-    // Underground temperature
-    temperature = linear(pos.y as f32, dimension_data.underground_height, [temperature, dimension_data.underground_temperature]);
-
-    // Underground temperature
-    temperature = linear(pos.y as f32, dimension_data.deep_underground_height, [temperature, dimension_data.deep_underground_temperature]);
-
-    if pos.y <= dimension_data.underground_height[0] as i32 && biome_data.underground {
-        temperature += biome_data.temperature[1];
-    }
-
-    // Block contributions to temperature
-    let parts = w.parts(pos);
-    parts.iter().for_each(|&s| {
-        let has_comp = TETANUS_BLOCK_LIQUID.on_block(s);
-        if !has_comp.is_none() {
-            let comp = has_comp.unwrap();
-            let max = if comp.temperature_limits_forced { comp.max_temperature.max(temperature) } else { comp.max_temperature };
-            let min = if comp.temperature_limits_forced { comp.min_temperature.min(temperature) } else { comp.min_temperature };
-            temperature = (temperature + comp.temperature).clamp(min, max);
-        }
-    });
-
-    temperature
-}
-
-fn wrap_u64(value: u64, min: u64, max: u64) -> u64 {
-    min + (value - min).rem_euclid(max - min)
-}
-
-fn linear(current_point: f32, points: [f32; 2], values: [f32; 2]) -> f32 {
-    if points[1] == 0.0 || points[0] == 0.0 || (points[1] - points[0]) == 0.0 {
-        return values[0];
-    }
-    if current_point < points[0] && points[0] < points[1] {
-        return values[0];
-    }
-    if current_point > points[1] && points[0] < points[1] {
-        return values[1];
-    }
-
-    // -200, -9000
-    if points[0] > points[1] {
-        if current_point > points[0] {
-            return values[0];
-        }
-        if current_point < points[1] {
-            return values[1];
-        }
-    }
-
-    let t = (current_point - points[0]) / (points[1] - points[0]);
-    values[0] + t * (values[1] - values[0])
 }
 
 fn tire(w: &World, player: u64, amount: f32) {
@@ -484,10 +490,20 @@ fn tick_player_temperature(w: &World, id: u64, st: EntityState) {
     if temperature.update_tick >= TEMPERATURE_UPDATE_FREQUENCY.get() as u16 {
         temperature.update_tick = 0;
         temperature.environmental_temperature =
-            get_local_temperature(w, BlockPos { x: st.pos.x as i32, y: st.pos.y as i32, z: st.pos.z as i32 });
+            get_block_temperature(w, BlockPos { x: st.pos.x as i32, y: st.pos.y as i32, z: st.pos.z as i32 });
+
+        temperature.environmental_temperature += w.attribute(id, &ATTRIBUTE_BASE_TEMPERATURE) as f32;
+        if temperature.environmental_temperature > 26.0 {
+            temperature.environmental_temperature =
+                (temperature.environmental_temperature - w.attribute(id, &ATTRIBUTE_HEAT_RESISTANCE) as f32).clamp(26.0, f32::MAX);
+        }
+        if temperature.environmental_temperature < 16.0 {
+            temperature.environmental_temperature =
+                (temperature.environmental_temperature + w.attribute(id, &ATTRIBUTE_COLD_RESISTANCE) as f32).clamp(f32::MIN, 16.0);
+        }
     }
 
-    let temperature_rate = w.attribute(id, &TEMPERATURE_RATE) as f32;
+    let temperature_rate = (w.attribute(id, &TEMPERATURE_RATE) as f32).clamp(0.00001, f32::MAX);
 
     if temperature.body_temperature < temperature.environmental_temperature {
         let difference = temperature.environmental_temperature - temperature.body_temperature;

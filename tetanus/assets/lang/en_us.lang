@@ -1,7 +1,5 @@
 mod.tetanus.name = Tetanus
-mod.tetanus.description = Adds thirst and temperature mechanics to weft.
-    Credit of this name goes to "fyrstikkeske".
-    Don't step on a rusty nail.
+mod.tetanus.description = Adds thirst and temperature mechanics to weft.\n\nCredit of this name goes to "fyrstikkeske".\nDon't step on a rusty nail.
 mod.tetanus.authors = L10nM4st3r
 
 
@@ -26,6 +24,10 @@ config.core.damage.tetanus.hypothermia.tooltip = Part of Tetanus
 config.core.damage.tetanus.incinerated.tooltip = Part of Tetanus (damage dealt when temperature is more than 100 degrees Celsius).
 config.core.damage.tetanus.melted.tooltip = Part of Tetanus (damage dealt when temperature is more than 600 degrees Celsius).
 
+tagged.tetanus.drink = {icons:tetanus:thirst_full value.thirst/2 dir:left} {icons:tetanus:thirst_overlay_full value.wet_throat/2 dir:left}
+tagged.tetanus.canteen = {icons:tetanus:thirst_full value.thirst/2 dir:left} {icons:tetanus:thirst_overlay_full value.wet_throat/2 dir:left}
+
+
 
 item.tetanus.empty_leather_canteen = Empty Leather Canteen
 item.tetanus.filled_leather_canteen = Leather Canteen
@@ -35,13 +37,23 @@ tetanus.debug_temperature = Temperature (Body: {0}, Environment: {1}, Overlay Fr
 tetanus.debug = Tetanus
 
 
+attribute.tetanus.thirst_rate = Thirsty Speed
 config.tetanus.thirst_rate = Thirst Rate
 config.tetanus.thirst_rate.tooltip = The higher this is, the faster they will dehydrate.
     (Default: 1.0)
+attribute.tetanus.base_temperature = °C
+config.tetanus.base_temperature = Base Temperature
+config.tetanus.base_temperature.tooltip = The base temperature to be given to all players.
+    (Default: 0.0)
+attribute.tetanus.heat_resistance = °C of heat resistance
+attribute.tetanus.cold_resistance = °C of cold resistance
 
+attribute.tetanus.temperature_rate = Temperature Change Speed
 config.tetanus.temperature_rate = Temperature Change Rate
 config.tetanus.temperature_rate.tooltip = The higher this is, the faster the player's temperature will shift to match their environment.
     (Default: 1.0)
+
+
 
 config.tetanus.thirst_enabled = Thirst Enabled
 config.tetanus.thirst_enabled.tooltip = Disable this if you would not like to worry about thirst/dehydration mechanics.

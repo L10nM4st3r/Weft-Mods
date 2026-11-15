@@ -13,6 +13,7 @@ pub static DRY_GRASS: Block = Block::named("dry_grass");
 pub static RED_MUSHROOM: Block = Block::named("red_mushroom");
 pub static BROWN_MUSHROOM: Block = Block::named("brown_mushroom");
 pub static BROWN_SHELF_MUSHROOM: Block = Block::named("brown_shelf_mushroom");
+pub static COARSE_DIRT: Block = Block::named("coarse_dirt");
 
 static CACTUS: Block = Block::named("base:cactus");
 
@@ -107,6 +108,15 @@ pub fn register(r: &mut Registry) {
         .model_box([1.0, 5.0, 11.0], [13.0, 7.0, 16.0])
         .model_box([2.0, 9.0, 11.0], [14.0, 11.0, 16.0])
         .needs(Dir::South, "")
+        .tab(&NATURAL);
+
+    r.block(&COARSE_DIRT)
+        .sound_group("base:block.gravel")
+        .hardness(0.5)
+        .mined_by("shovel", tool_tier::HAND)
+        .tag("coarse_dirt")
+        // TODO: Use a component to vanilla to allow changing what it tills to.
+        .tag("tillable")
         .tab(&NATURAL);
 
     // Cactus grows a flower once it is three tall.

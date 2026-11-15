@@ -3,10 +3,8 @@
 
 use base_api::OVERWORLD;
 use weft_sdk::noise::{hash, unit};
-use weft_sdk::terrain::{Caves, Expr, preset};
+use weft_sdk::terrain::{BiomeRule, Expr, preset};
 use weft_sdk::*;
-
-pub const SEA: i32 = 63;
 
 use crate::blocks::BRANCH; //, BROWN_SHELF_MUSHROOM};
 use crate::blocks_rocks::{
@@ -29,7 +27,11 @@ static PEBBLES_SCATTER: Feature = Feature::named("pebbles");
 static WILD_CROPS_SCATTER: Feature = Feature::named("wild_crops");
 static ROCK_LAYER_FEATURE: Feature = Feature::named("rock_layers");
 
+static ABANDONED_HOUSE_1_TEMPLATE: Template = Template::named("abandoned_house_1");
+static ABANDONED_HOUSE_1_FEATURE: Feature = Feature::named("abandoned_house_1");
+
 static GRAVEL: Block = Block::named("base:gravel");
+static DIRT: Block = Block::named("base:dirt");
 //static BIRCH_LOG: Block = Block::named("base:birch_log");
 
 /// Where the crust ends and the mantle begins.
@@ -50,20 +52,25 @@ const DESERT_CROPS: &str = "dead_bush:1 dry_grass:2";
 const DEFAULT_PEBBLES: &str = "beauty_of_nature:stone_pebble:6 beauty_of_nature:iron_pebble:1";
 const MOUNTAIN_PEBBLES: &str = "beauty_of_nature:stone_pebble:4 beauty_of_nature:iron_pebble:2";
 
+static COLD_OCEAN: Biome = Biome::named("cold_ocean");
+static OCEAN: Biome = Biome::named("base:ocean");
+
 pub fn register(r: &mut Registry) {
+    ////////////////////////////////////////////////////////
+    // Biomes
     // (biome, flowers, branches, pebbles, crops and how many)
     for (biome, flowers, branches, pebble_cover, (crops, cover), pebbles) in [
-        ("plains", Some(FLOWERS_PLAIN), 0.01, 0.005, (WILD_CROPS, 0.002), DEFAULT_PEBBLES),
-        ("forest", Some(FLOWERS_FOREST), 0.05, 0.02, (WILD_CROPS, 0.0001), DEFAULT_PEBBLES),
-        ("birch_forest", Some(FLOWERS_BIRCH), 0.05, 0.02, (WILD_CROPS, 0.0001), DEFAULT_PEBBLES),
-        ("taiga", Some(FLOWERS_FOREST), 0.05, 0.02, (WILD_CROPS, 0.0001), DEFAULT_PEBBLES),
-        ("mountains", Some(FLOWERS_PLAIN), 0.0, 0.02, (WILD_CROPS, 0.0), MOUNTAIN_PEBBLES),
-        ("desert", None, 0.0, 0.0, (DESERT_CROPS, 0.005), DEFAULT_PEBBLES),
+        ("plains", Some(FLOWERS_PLAIN), 0.01, 0.02, (WILD_CROPS, 0.05), DEFAULT_PEBBLES),
+        ("forest", Some(FLOWERS_FOREST), 1.0, 0.04, (WILD_CROPS, 0.02), DEFAULT_PEBBLES),
+        ("birch_forest", Some(FLOWERS_BIRCH), 1.0, 0.02, (WILD_CROPS, 0.02), DEFAULT_PEBBLES),
+        ("taiga", Some(FLOWERS_FOREST), 1.0, 0.04, (WILD_CROPS, 0.02), DEFAULT_PEBBLES),
+        ("mountains", Some(FLOWERS_PLAIN), 0.0, 0.25, (WILD_CROPS, 0.0), MOUNTAIN_PEBBLES),
+        ("desert", None, 0.0, 0.0, (DESERT_CROPS, 0.5), DEFAULT_PEBBLES),
     ] {
         let b = r
             .edit(Biome::generated(format!("base:{biome}")))
-            .set(&BRANCH_COVER, branches)
-            .set(&PEBBLE_COVER, pebble_cover)
+            .set(&BRANCH_COVER, branches * 10.0)
+            .set(&PEBBLE_COVER, pebble_cover * 10.0)
             .set(&CROP_COVER, cover)
             .set_text(&PEBBLE_LIST, pebbles)
             .set_text(&CROPS, crops);
@@ -71,6 +78,17 @@ pub fn register(r: &mut Registry) {
             b.set_text(&FLOWERS, f);
         }
     }
+
+    r.edit::<kind::Biome>(&OCEAN).temperature(-0.15..);
+    r.biome(&COLD_OCEAN)
+        .temperature(..-0.15)
+        .surface("base:gravel", "base:gravel", 3)
+        .deep_top("base:gravel", 63 - 8)
+        .tag("ocean")
+        .tag("cold");
+
+    ////////////////////////////////////////////////////////
+    // Decor
 
     let crop = |site: &Plan| {
         CROPS
@@ -88,13 +106,14 @@ pub fn register(r: &mut Registry) {
         (&WILD_CROPS_SCATTER, &CROP_COVER, "#desert_plant_soil", crop),
     ];
 
+    //////////////////// Stopped game from launching.
     for (scatter, cover, ground, pick) in scatters {
         let s = r
             .scatter(scatter)
             .density(cover)
             .turns()
-            //cells(1)
             .dimension(&OVERWORLD)
+            .stage(abi::stage::POST_PROCESS)
             .plan(move |site| {
                 if let Some(what) = pick(site) {
                     site.put(site.pos(), what);
@@ -107,8 +126,8 @@ pub fn register(r: &mut Registry) {
     }
 
     r.ore(&GRAVEL)
-        .chance(0.1)
-        .spacing(16)
+        .chance(0.2)
+        .spacing(8)
         .vein(Vein::disk(4.0, 3.0))
         .ground("base:sand")
         .over_water()
@@ -124,16 +143,19 @@ pub fn register(r: &mut Registry) {
                 deep_underground_temperature: 5450.0,
                 deep_underground_height: [-2_000_000.0, -6_000_000.0],
                 elevated_temperature: -10.0,
-                elevated_height: [80.0, 512.0],
+                elevated_height: [300.0, 512.0],
             },
         );
     }
 
     r.feature(&ROCK_LAYER_FEATURE)
         .generate(rock_layers)
+        .stage(abi::stage::UNDERGROUND)
         .dimension(&OVERWORLD);
 
     // Base's ores, deeper and with a block of their own where a vein goes through dense rock.
+    //
+    //////////////////// Stopped game from launching.
     for ((ore, ..), (min_y, max_y, veins, size, exposed)) in ORES.iter().zip([
         (-128, 128, 6, 8, 0.0),
         (-128, 128, 4, 5, 0.0),
@@ -145,19 +167,11 @@ pub fn register(r: &mut Registry) {
         let super_dense = Block::generated(format!("super_dense_rock_{ore}_ore"));
         let ultra_dense = Block::generated(format!("ultra_dense_rock_{ore}_ore"));
 
-        // r.ore(dense)
-        //     .y(i32::MIN, max_y)
-        //     .per_cube(veins)
-        //     .vein_size(size).after(&ROCK_LAYER_FEATURE)
-        //     .replaces("#dense_rock_ore_replaceables")
-        //     .replaces_with("#super_dense_rock_ore_replaceables", super_dense)
-        //     .replaces_with("#ultra_dense_rock_ore_replaceables", ultra_dense)
-        //     .exposed(exposed);
-
         r.edit(Block::generated(format!("base:{ore}_ore")).ore())
             .y(min_y, max_y)
             .per_cube(veins)
             .vein_size(size)
+            .stage(abi::stage::STRUCTURES)
             .after(&ROCK_LAYER_FEATURE)
             .exposed(exposed)
             .replaces("#stone_ore_replaceables")
@@ -167,35 +181,23 @@ pub fn register(r: &mut Registry) {
     }
 
     r.edit::<kind::Terrain>(OVERWORLD.terrain())
-        .landform(preset::continents(-200.0))
-        //.landform(preset::mountains(15.0, 100.0))
-        .landform(preset::mountains(50.0, 800.0));
-    //     .;
-    //     .feature(preset::continents(18.0))
-    //     // Biomes shape the land through their climate, not their borders, so nothing seams:
-    //     // the cold flattens hills into tundra, deserts get dunes.
-    //     .feature(preset::hills(16.0, 110.0).mask(Expr::temperature().ramp(-0.35, -0.6).not()))
-    //     .feature(
-    //         preset::dunes(4.0, 26.0).mask(
-    //             Expr::temperature()
-    //                 .ramp(0.25, 0.45)
-    //                 .and(Expr::humidity().ramp(0.1, -0.05)),
-    //         ),
-    //     )
-    //     // How mountainous a place is: the mountains' strength, and where the mountains biome goes.
-    //     .field(
-    //         "base:mountains",
-    //         Expr::fbm(0x44, 800.0, 3)
-    //             .ramp(-0.0, 0.4)
-    //             .and(Expr::continent().ramp(0.0, 0.05)),
-    //     )
-    //     .feature(
-    //         preset::mountains(200.0, 600.0)
-    //             .mask(Expr::field("base:mountains"))
-    //             .named("mountains"),
-    //     )
-    //     .feature(preset::continents(-170.0))
-    //     .caves(Caves::new("base:lava", i32::MIN, -256));
+        .landform(preset::continents(-100.0).mask(Expr::continent().not()))
+        .rule(BiomeRule::new("cold_ocean").height(..=63 - 2));
+
+    // Structure features
+
+    //////////////////// Stopped game from launching.
+    r.feature(&ABANDONED_HOUSE_1_FEATURE)
+        .foundation(&DIRT)
+        .chance(0.01)
+        .clear_above()
+        .spacing(200)
+        .height(Height::uniform(65, 180))
+        .biome("base:plains")
+        .turns()
+        .priority(2)
+        .stage(abi::stage::STRUCTURES)
+        .template(&ABANDONED_HOUSE_1_TEMPLATE);
 }
 
 /// Create multiple layers of different rocks.

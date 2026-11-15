@@ -20,7 +20,8 @@ pub fn register(r: &mut Registry) {
     r.block(&BRICK_STOVE)
         // Front towards the player; unlit and lit.
         .sound_group("base:block.stone")
-        .texture("base:log_oak")
+        .texture("brick_stove_side")
+        .ends("brick_stove_top")
         .facing(Facings::HORIZONTAL, Toward::Player)
         .hardness(3.5)
         .mined_by("pickaxe", 0)
@@ -28,10 +29,7 @@ pub fn register(r: &mut Registry) {
         .states(|p, s: State| {
             let lit = p.is("lit", "true");
 
-            let s = s
-                .front(if lit { "brick_stove_front_lit" } else { "brick_stove_front" })
-                .sides("brick_stove_side")
-                .ends("brick_stove_top");
+            let s = s.front(if lit { "brick_stove_front_lit" } else { "brick_stove_front" });
             if lit { s.light_rgb(13, 11, 8) } else { s }
         })
         .tab(&FUNCTIONAL)

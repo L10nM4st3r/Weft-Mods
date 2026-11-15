@@ -6,7 +6,7 @@
 //! Names here are full (`base:..`): the statics compile into whichever mod uses them.
 
 use base_api::{FOOD, HUNGER, eat as vanilla_eat};
-use weft_sdk::*;
+use weft_sdk::{comps::dimension::DAY_LENGTH, *};
 
 static ALWAYS_EATABLE: Tag = Tag::named("can_always_eat");
 static WATER: Tag = Tag::named("water");
@@ -196,20 +196,83 @@ value! {
 /// Tough as rust settings for a liquid block. These settings only apply to the player when standing inside the liquid.
 pub static TETANUS_BLOCK_LIQUID: Component<TetanusBlockLiquid> = Component::named("tetanus:block_liquid");
 
-value! {
-    /// Tough as rust settings for a liquid block. These settings only apply to the player when standing inside the liquid.
-    pub struct TetanusArmour {
-        /// Higher values above 0 will increase how long it takes body temperature to move to the enviromental one.
-        /// Lower values have the opposite effect.
-        pub insulation: f32,
-        /// Cools the wearer down by up to this much, without going below 26 degrees celcius.
-        pub heat_resistance: f32,
-        /// Warms the wearer up by up to this much, without going above 16 degrees celcius.
-        pub cold_resistance: f32,
-        /// Flat change to the wearer's temperature.
-        pub temperature: bool
+pub fn get_block_temperature(w: &World, pos: BlockPos) -> f32 {
+    let (biome, dimension) = (w.biome(pos), w.dimension());
+    let biome_data_option = TETANUS_BIOME.on_biome(biome);
+
+    let biome_data: TetanusBiome;
+    if biome_data_option.is_none() {
+        biome_data = DEFAULT_BIOME;
+    } else {
+        biome_data = biome_data_option.unwrap();
     }
+
+    let Some(dimension_data) = TETANUS_DIMENSION.on_dimension(dimension) else { return 0.0 };
+    let day_length = DAY_LENGTH.on_dimension(dimension).unwrap_or(24000) as u64;
+
+    // Time of day temperature
+    let time_of_day = wrap_u64(w.day_time(), 0, day_length);
+    let is_day = time_of_day < (day_length as f32 * 0.55) as u64;
+
+    let mut temperature = if is_day {
+        dimension_data.temperature[0] + biome_data.temperature[0]
+    } else {
+        dimension_data.temperature[1] + biome_data.temperature[1]
+    };
+
+    // Elevation temperature
+    temperature += linear(pos.y as f32, dimension_data.elevated_height, [0.0, dimension_data.elevated_temperature]);
+
+    // Underground temperature
+    temperature = linear(pos.y as f32, dimension_data.underground_height, [temperature, dimension_data.underground_temperature]);
+
+    // Underground temperature
+    temperature = linear(pos.y as f32, dimension_data.deep_underground_height, [temperature, dimension_data.deep_underground_temperature]);
+
+    if pos.y <= dimension_data.underground_height[0] as i32 && biome_data.underground {
+        temperature += biome_data.temperature[1];
+    }
+
+    // Block contributions to temperature
+    let parts = w.parts(pos);
+    parts.iter().for_each(|&s| {
+        let has_comp = TETANUS_BLOCK_LIQUID.on_block(s);
+        if !has_comp.is_none() {
+            let comp = has_comp.unwrap();
+            let max = if comp.temperature_limits_forced { comp.max_temperature.max(temperature) } else { comp.max_temperature };
+            let min = if comp.temperature_limits_forced { comp.min_temperature.min(temperature) } else { comp.min_temperature };
+            temperature = (temperature + comp.temperature).clamp(min, max);
+        }
+    });
+
+    temperature
 }
 
-/// Tough as rust settings for a liquid block. These settings only apply to the player when standing inside the liquid.
-pub static TETANUS_ARMOUR: Component<TetanusArmour> = Component::named("tetanus:armour");
+fn wrap_u64(value: u64, min: u64, max: u64) -> u64 {
+    min + (value - min).rem_euclid(max - min)
+}
+
+fn linear(current_point: f32, points: [f32; 2], values: [f32; 2]) -> f32 {
+    if points[1] == 0.0 || points[0] == 0.0 || (points[1] - points[0]) == 0.0 {
+        return values[0];
+    }
+    if current_point < points[0] && points[0] < points[1] {
+        return values[0];
+    }
+    if current_point > points[1] && points[0] < points[1] {
+        return values[1];
+    }
+
+    // -200, -9000
+    if points[0] > points[1] {
+        if current_point > points[0] {
+            return values[0];
+        }
+        if current_point < points[1] {
+            return values[1];
+        }
+    }
+
+    let t = (current_point - points[0]) / (points[1] - points[0]);
+    values[0] + t * (values[1] - values[0])
+}

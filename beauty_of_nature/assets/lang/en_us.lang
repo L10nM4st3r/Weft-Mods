@@ -1,9 +1,14 @@
+mod.beauty_of_nature.name = Beauty Of Nature
+mod.beauty_of_nature.description = Adds new plants, rocks, and natural decorations.\nFinally, the birch forest update we've all been waiting for.
+mod.beauty_of_nature.authors = L10nM4st3r
+
 block.beauty_of_nature.blue_orchid = Blue Orchid
 block.beauty_of_nature.branch = Branch
 block.beauty_of_nature.stone_pebble = Stone Pebble
 block.beauty_of_nature.iron_pebble = Iron Pebble
 block.beauty_of_nature.cactus_flower = Cactus Flower
 block.beauty_of_nature.dense_rock = Dense Rock
+block.beauty_of_nature.coarse_dirt = Coarse Dirt
 block.beauty_of_nature.cobbled_dense_rock = Cobbled Dense Rock
 block.beauty_of_nature.dense_rock_coal_ore = Dense Rock Coal Ore
 block.beauty_of_nature.dense_rock_iron_ore = Dense Rock Iron Ore
@@ -41,8 +46,3 @@ block.beauty_of_nature.dry_grass = Dry Grass
 block.beauty_of_nature.brown_mushroom = Brown Mushroom
 block.beauty_of_nature.red_mushroom = Red Mushroom
 block.beauty_of_nature.brown_shelf_mushroom = Brown Shelf Mushroom
-
-mod.beauty_of_nature.name = Beauty Of Nature
-mod.beauty_of_nature.description = Adds new plants, rocks, and natural decorations.
-    Finally, the birch forest update we've all been waiting for.
-mod.beauty_of_nature.authors = L10nM4st3r

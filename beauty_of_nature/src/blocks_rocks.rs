@@ -100,12 +100,12 @@ pub fn register(r: &mut Registry) {
                     },
                 )
         })
+        .fog(0x991A00, 1.0, 5.0)
         .flow_delay(120)
         .drop_off(2)
         .slope_find(2)
         .heat(3850)
         //.density(100000)
-        .fog(0x991A00, 1.0)
         .no_overlay()
         .bucket(Item::generated("core_liquid_bucket".into()), Item::generated("base:bucket".into()), &TOOLS);
     r.liquid_reaction("#core_liquid", "#water")

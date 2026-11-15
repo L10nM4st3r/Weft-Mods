@@ -65,4 +65,4 @@ jobs:
           mods: |          # the mod folders; default: the repository root
             beauty_of_nature
             slow_start
-  #          tetanus
+            tetanus

@@ -1,6 +1,6 @@
 [package]
 name = "beauty_of_nature"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2024"
 
 [lib]
@@ -10,8 +10,8 @@ crate-type = ["cdylib"]
 # name = "examplemod"
 
 [dependencies]
-weft_sdk = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.5" }
-base_api = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.5" }
+weft_sdk = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.6" }
+base_api = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.6" }
 tetanus_api = { path = "../tetanus/api" }
 
 

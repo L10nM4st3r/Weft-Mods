@@ -248,6 +248,49 @@ pub fn get_block_temperature(w: &World, pos: BlockPos) -> f32 {
     temperature
 }
 
+pub fn get_constant_block_temperature(w: &World, pos: BlockPos) -> f32 {
+    let (biome, dimension) = (w.biome(pos), w.dimension());
+    let biome_data_option = TETANUS_BIOME.on_biome(biome);
+
+    let biome_data: TetanusBiome;
+    if biome_data_option.is_none() {
+        biome_data = DEFAULT_BIOME;
+    } else {
+        biome_data = biome_data_option.unwrap();
+    }
+
+    let Some(dimension_data) = TETANUS_DIMENSION.on_dimension(dimension) else { return 0.0 };
+
+    let mut temperature = dimension_data.temperature[0] + biome_data.temperature[0];
+
+    // Elevation temperature
+    temperature += linear(pos.y as f32, dimension_data.elevated_height, [0.0, dimension_data.elevated_temperature]);
+
+    // Underground temperature
+    temperature = linear(pos.y as f32, dimension_data.underground_height, [temperature, dimension_data.underground_temperature]);
+
+    // Underground temperature
+    temperature = linear(pos.y as f32, dimension_data.deep_underground_height, [temperature, dimension_data.deep_underground_temperature]);
+
+    if pos.y <= dimension_data.underground_height[0] as i32 && biome_data.underground {
+        temperature += biome_data.temperature[1];
+    }
+
+    // Block contributions to temperature
+    let parts = w.parts(pos);
+    parts.iter().for_each(|&s| {
+        let has_comp = TETANUS_BLOCK_LIQUID.on_block(s);
+        if !has_comp.is_none() {
+            let comp = has_comp.unwrap();
+            let max = if comp.temperature_limits_forced { comp.max_temperature.max(temperature) } else { comp.max_temperature };
+            let min = if comp.temperature_limits_forced { comp.min_temperature.min(temperature) } else { comp.min_temperature };
+            temperature = (temperature + comp.temperature).clamp(min, max);
+        }
+    });
+
+    temperature
+}
+
 fn wrap_u64(value: u64, min: u64, max: u64) -> u64 {
     min + (value - min).rem_euclid(max - min)
 }

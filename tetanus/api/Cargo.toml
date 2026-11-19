@@ -5,5 +5,5 @@ edition = "2024"
 
 # Types and handles of the base game other mods compile against; no code of the game itself.
 [dependencies]
-weft_sdk = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.5" }
-base_api = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.5" }
+weft_sdk = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.6" }
+base_api = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.6" }

@@ -1,6 +1,6 @@
 [package]
 name = "slow_start"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2024"
 
 [lib]
@@ -10,8 +10,8 @@ crate-type = ["cdylib"]
 # name = "examplemod"
 
 [dependencies]
-weft_sdk = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.5" }
-base_api = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.5" }
+weft_sdk = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.6" }
+base_api = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.6" }
 slow_start_api = { path = "./api" }
 lion_lib = { path = "../lion_lib" }
 

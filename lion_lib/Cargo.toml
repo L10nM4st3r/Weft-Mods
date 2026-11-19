@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-weft_sdk = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.5" }
-base_api = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.5" }
+weft_sdk = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.6" }
+base_api = { git = "https://github.com/Weft-Rust/Weft", tag="v26.11.6" }
 
 
 [workspace]

@@ -28,8 +28,8 @@ static PEBBLES_SCATTER: Feature = Feature::named("pebbles");
 static WILD_CROPS_SCATTER: Feature = Feature::named("wild_crops");
 static ROCK_LAYER_FEATURE: Feature = Feature::named("rock_layers");
 
-static ABANDONED_HOUSE_1_TEMPLATE: Template = Template::named("abandoned_house_1");
-static ABANDONED_HOUSE_1_FEATURE: Feature = Feature::named("abandoned_house_1");
+// static ABANDONED_HOUSE_1_TEMPLATE: Template = Template::named("abandoned_house_1");
+// static ABANDONED_HOUSE_1_FEATURE: Feature = Feature::named("abandoned_house_1");
 
 static GRAVEL: Block = Block::named("base:gravel");
 static DIRT: Block = Block::named("base:dirt");
@@ -171,7 +171,6 @@ pub fn register(r: &mut Registry) {
             .per_cube(veins)
             .vein_size(size)
             .stage(abi::stage::STRUCTURES)
-            .after(&ROCK_LAYER_FEATURE)
             .exposed(exposed)
             .replaces("#stone_ore_replaceables")
             .replaces_with("#dense_rock_ore_replaceables", dense)
@@ -185,17 +184,17 @@ pub fn register(r: &mut Registry) {
 
     // Structure features
 
-    r.feature(&ABANDONED_HOUSE_1_FEATURE)
-        .foundation(&DIRT)
-        .chance(0.01)
-        .clear_above()
-        .spacing(200)
-        .height(Height::uniform(65, 180))
-        .biome("base:plains")
-        .turns()
-        .priority(2)
-        .stage(abi::stage::STRUCTURES)
-        .template(&ABANDONED_HOUSE_1_TEMPLATE);
+    // r.feature(&ABANDONED_HOUSE_1_FEATURE)
+    //     .foundation(&DIRT)
+    //     .chance(0.01)
+    //     .clear_above()
+    //     .spacing(200)
+    //     .height(Height::uniform(65, 180))
+    //     .biome("base:plains")
+    //     .turns()
+    //     .priority(2)
+    //     .stage(abi::stage::STRUCTURES)
+    //     .template(&ABANDONED_HOUSE_1_TEMPLATE);
 }
 
 /// Create multiple layers of different rocks.
